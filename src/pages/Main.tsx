@@ -1,9 +1,11 @@
-import { Box, styled, Typography } from "@mui/material";
-import { NavLink, useLocation } from "react-router-dom";
+import { Box, Button, Stack, styled, Typography } from "@mui/material";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import Monogram from "/monogram.png";
 import Name from "/name.svg";
 import AnimatedImage from "../Components/AnimatedImage";
 import PageWrapper from "../Components/PageWrapper";
+import { Peg } from "../Components/Spillrad";
+import { routes } from "../variables";
 
 const images: string[] = Object.values(
   import.meta.glob("/FrontpageImages/*.{png,jpg,jpeg}", { eager: true })
@@ -17,7 +19,28 @@ const Main = () => {
   return (
     <Box className="scroll-animation">
       <PageWrapper>
-        <Typography variant="h1">Mastermind</Typography>
+        <Stack gap={3}>
+          <Box>
+            <Box height={"20px"} width={"20px"}>
+              <Peg color="pink" />
+            </Box>
+            <Box height={"20px"} width={"20px"}>
+              <Peg color="red" />
+            </Box>
+            <Box height={"20px"} width={"20px"}>
+              <Peg color="pink" />
+            </Box>
+            <Box height={"20px"} width={"20px"}>
+              <Peg color="pink" />
+            </Box>
+          </Box>
+          <Typography variant="h3" component={"h1"}>
+            MASTERMIND
+          </Typography>
+          <Button component={Link} to={routes.gameSetup}>
+            Start
+          </Button>
+        </Stack>
       </PageWrapper>
     </Box>
   );

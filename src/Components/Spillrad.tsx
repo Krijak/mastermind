@@ -1,4 +1,6 @@
 import { PropsWithChildren, useEffect, useState } from "react";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
 import { Box, Button, Stack, styled, Typography } from "@mui/material";
 
 type Colors = "pink" | "red" | "green" | "purple" | "orange" | "black";
@@ -103,7 +105,10 @@ export const Spillrad = ({
         </Stack>
         {allSlotsAreFilled && (
           <Box mt={5}>
-            <Button variant="outlined">OK lets gooo!</Button>
+            <Button>
+              OK lets gooo!{" "}
+              <ArrowForwardIosIcon sx={{ fontSize: "0.8em", marginLeft: 1 }} />
+            </Button>
           </Box>
         )}
       </Stack>
@@ -117,7 +122,7 @@ export const Spillrad = ({
 
 export default Spillrad;
 
-const Peg = styled("div", {
+export const Peg = styled("div", {
   shouldForwardProp: (prop) => prop !== "color",
 })<PegColor>(({ color }) => ({
   backgroundColor: color,

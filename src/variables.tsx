@@ -13,5 +13,5 @@ export const routes: RoutesType = {
   program: "program",
   transportOgOvernatting: "transportogovernatting",
   informasjon: "informasjon",
-  gameSetup: "gameSetup",
+  gameSetup: "/gameSetup",
 };

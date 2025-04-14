@@ -110,14 +110,14 @@ const Topbar = () => {
               <Link to="/">{/* <img src={Name} width={"100%"} /> */}</Link>
             </Box>
           )}
-          <IconButton
+          {/* <IconButton
             aria-label="åpne meny"
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { lg: "none" } }}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
           <Stack
             sx={{ display: { xs: "none", sm: "none", md: "none", lg: "flex" } }}
             flexDirection={"row"}

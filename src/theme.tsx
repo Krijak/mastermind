@@ -72,8 +72,9 @@ export const theme = createTheme({
     },
     h3: {
       fontSize: "1.1rem",
-      fontWeight: 100,
+      fontWeight: 600,
       letterSpacing: "0.09em",
+
       color: black,
       xs: {
         fontSize: "1rem",
