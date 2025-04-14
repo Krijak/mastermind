@@ -18,19 +18,9 @@ type NavItem = {
   href: string;
 };
 
-const isExternalLinks = (href: string): boolean =>
-  [routes.onskeliste, routes.rsvp].includes(href);
-
 const navItems: NavItem[] = [
   { title: "Forside", href: routes.forside },
-  { title: "Program", href: routes.program },
-  { title: "Transport og overnatting", href: routes.transportOgOvernatting },
-  { title: "Informasjon", href: routes.informasjon },
-  {
-    title: "RSVP",
-    href: routes.rsvp,
-  },
-  { title: "Ønskeliste", href: routes.onskeliste },
+  { title: "Game setup", href: routes.gameSetup },
 ];
 
 const MenuItem = ({
@@ -39,7 +29,6 @@ const MenuItem = ({
   locationPath,
 }: NavItem & { locationPath: string }) => {
   const isMainAndActive = href == "/" && locationPath == "/main";
-  const isExternal = isExternalLinks(href);
   return (
     <StyledNavLinkWrapper display={"inline"} title={title}>
       <NavLink
@@ -48,9 +37,8 @@ const MenuItem = ({
         className={({ isActive }) =>
           isActive || isMainAndActive ? "active" : ""
         }
-        target={isExternal ? "_blank" : "_self"}
       >
-        {title} {isExternal && <OpenInNewIcon />}
+        {title}
       </NavLink>
     </StyledNavLinkWrapper>
   );

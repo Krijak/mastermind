@@ -11,6 +11,7 @@ import Program from "./pages/Program";
 import TransportOgOvernatting from "./pages/TransportOgOvernatting";
 import theme from "./theme";
 import { routes } from "./variables";
+import GameSetup from "./pages/GameSetup";
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -26,6 +27,7 @@ function App() {
             <Routes>
               <Route path={routes.forside} element={<Main />} />
               <Route path={routes.main} element={<Main />} />
+              <Route path={routes.gameSetup} element={<GameSetup />} />
               <Route path={routes.program} element={<Program />} />
               <Route path={routes.informasjon} element={<Informasjon />} />
               <Route

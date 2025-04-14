@@ -58,7 +58,7 @@ export const theme = createTheme({
       fontSize: "1.2rem",
       letterSpacing: "0.4em",
       color: black,
-      fontFamily: "Cormorant Garamond, serif",
+      fontFamily: "Raleway, serif",
       fontWeight: 300,
       fontStyle: "normal",
       xs: {
