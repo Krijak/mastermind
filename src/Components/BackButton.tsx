@@ -1,13 +1,16 @@
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { Link, To } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export const BackButton = (to: { to: To }) => {
+export const BackButton = () => {
+  const navigate = useNavigate();
   return (
-    <Button component={Link} to={to.to}>
-      <ArrowBackIosIcon sx={{ fontSize: "0.8em" }} />
-      Tilbake
-    </Button>
+    <Box mt={3} ml={3}>
+      <Button onClick={() => navigate(-1)}>
+        <ArrowBackIosIcon sx={{ fontSize: "0.8em" }} />
+        Tilbake
+      </Button>
+    </Box>
   );
 };
 

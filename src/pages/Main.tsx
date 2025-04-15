@@ -1,43 +1,35 @@
-import { Box, Button, Stack, styled, Typography } from "@mui/material";
-import { Link, NavLink, useLocation } from "react-router-dom";
-import Monogram from "/monogram.png";
-import Name from "/name.svg";
-import AnimatedImage from "../Components/AnimatedImage";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import PageWrapper from "../Components/PageWrapper";
-import { Peg } from "../Components/Spillrad";
 import { routes } from "../variables";
+import { Peg } from "../Components/PegRow";
+import { PegColor } from "../Components/SetCode";
 
-const images: string[] = Object.values(
-  import.meta.glob("/FrontpageImages/*.{png,jpg,jpeg}", { eager: true })
-).map((module) => (module as any).default);
+const LogoPeg = (color: PegColor) => (
+  <Box height={"20px"} width={"20px"} className="scroll-animation">
+    <Peg color={color.color} />
+  </Box>
+);
 
 const Main = () => {
-  const location = useLocation();
-  const randomImageIndex = Math.floor(Math.random() * images.length);
-  const alt = "test";
-
   return (
     <Box className="scroll-animation">
       <PageWrapper>
-        <Stack gap={3}>
+        <Stack gap={3} mt={3}>
           <Box>
-            <Box height={"20px"} width={"20px"}>
-              <Peg color="pink" />
-            </Box>
-            <Box height={"20px"} width={"20px"}>
-              <Peg color="red" />
-            </Box>
-            <Box height={"20px"} width={"20px"}>
-              <Peg color="pink" />
-            </Box>
-            <Box height={"20px"} width={"20px"}>
-              <Peg color="pink" />
-            </Box>
+            <LogoPeg color={"pink"} />
+            <LogoPeg color="red" />
+            <LogoPeg color="pink" />
+            <LogoPeg color="pink" />
           </Box>
           <Typography variant="h3" component={"h1"}>
             MASTERMIND
           </Typography>
-          <Button component={Link} to={routes.gameSetup}>
+          <Button
+            component={Link}
+            to={routes.gameSetup}
+            className="scroll-animation"
+          >
             Start
           </Button>
         </Stack>
@@ -47,9 +39,3 @@ const Main = () => {
 };
 
 export default Main;
-
-const StyledNavLink = styled(NavLink)({
-  "&:focus": {
-    outline: "none",
-  },
-});

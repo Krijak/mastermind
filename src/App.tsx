@@ -1,41 +1,25 @@
 import { ThemeProvider } from "@mui/material/styles";
-import { useState } from "react";
 import { Route, Routes } from "react-router";
 import { HashRouter } from "react-router-dom";
 import AppWrapper from "./Components/AppWrapper";
-import Topbar from "./Components/Topbar";
-import Informasjon from "./pages/Informasjon";
-import Loading from "./pages/Loading";
 import Main from "./pages/Main";
-import Program from "./pages/Program";
-import TransportOgOvernatting from "./pages/TransportOgOvernatting";
 import theme from "./theme";
 import { routes } from "./variables";
 import GameSetup from "./pages/GameSetup";
+import Game from "./pages/Game";
 
 function App() {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [showLoading, setShowLoading] = useState(true);
-
   return (
     <HashRouter>
-      <AppWrapper setIsLoaded={setIsLoaded} setShowLoading={setShowLoading}>
+      <AppWrapper>
         <ThemeProvider theme={theme}>
-          {!isLoaded && <Loading isLoading={showLoading} />}
-          <Topbar />
-          {isLoaded && (
-            <Routes>
-              <Route path={routes.forside} element={<Main />} />
-              <Route path={routes.main} element={<Main />} />
-              <Route path={routes.gameSetup} element={<GameSetup />} />
-              <Route path={routes.program} element={<Program />} />
-              <Route path={routes.informasjon} element={<Informasjon />} />
-              <Route
-                path={routes.transportOgOvernatting}
-                element={<TransportOgOvernatting />}
-              />
-            </Routes>
-          )}
+          {/* <Topbar /> */}
+          <Routes>
+            <Route path={routes.forside} element={<Main />} />
+            <Route path={routes.main} element={<Main />} />
+            <Route path={routes.gameSetup} element={<GameSetup />} />
+            <Route path={routes.game} element={<Game />} />
+          </Routes>
         </ThemeProvider>
       </AppWrapper>
     </HashRouter>
