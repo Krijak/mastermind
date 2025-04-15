@@ -41,12 +41,8 @@ const Game = () => {
     setActiveSlot(undefined);
   };
 
-  const isAllCorrect = (bol: boolean) => {
-    setAllCorrect(bol && noWrongs());
-  };
-
-  const noWrongs = () => {
-    return isError.filter((row) => row === true).length === 0;
+  const isAllCorrect = (bol: boolean, rowIndex: number) => {
+    setAllCorrect(bol && !calculateError(rowIndex));
   };
 
   const calculateError = (rowIndex: number) => {

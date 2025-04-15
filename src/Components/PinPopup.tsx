@@ -21,7 +21,7 @@ export const PinPopup = ({
   open: boolean;
   onClose: () => void;
   activeRow: number;
-  setAllCorrect: (allCorrect: boolean) => void;
+  setAllCorrect: (allCorrect: boolean, activeRow: number) => void;
 }) => {
   const { code, game, pins, setPins } = useContext(CodeContext);
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
@@ -110,7 +110,7 @@ export const PinPopup = ({
               onClick={() => {
                 onClose();
                 if (pins[activeRow].every((color) => color === "black"))
-                  setAllCorrect(true);
+                  setAllCorrect(true, activeRow);
               }}
             >
               OK
