@@ -21,7 +21,7 @@ const Main = () => {
   );
 
   useEffect(() => {
-    setNoExistigCode(code.every((item) => item === undefined));
+    setNoExistigCode(code.every((item) => item == undefined));
   }, [code]);
 
   return (
