@@ -16,7 +16,25 @@ export type Tuple<
 
 export const numPegs = 4 as const;
 
+// export type Colors =
+//   | "#8f2c5d"
+//   | "red"
+//   | "pink"
+//   | "orange"
+//   | "#4f74a9"
+//   | "lightblue";
+
+// export const colors: Colors[] = [
+//   "#8f2c5d",
+//   "red",
+//   "pink",
+//   "orange",
+//   "#4f74a9",
+//   "lightblue",
+// ];
+
 export type Colors = "pink" | "red" | "green" | "purple" | "orange" | "black";
+
 export const colors: Colors[] = [
   "pink",
   "red",
