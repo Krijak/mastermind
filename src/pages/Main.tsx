@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { CodeContext } from "../Components/AppWrapper";
 
 const LogoPeg = (color: PegColor) => (
-  <Box height={"10px"} width={"10px"} className="scroll-animation">
+  <Box height={"13px"} width={"13px"} className="scroll-animation">
     <Peg color={color.color} />
   </Box>
 );
@@ -21,7 +21,6 @@ const Main = () => {
   );
 
   useEffect(() => {
-    console.log(code);
     setNoExistigCode(code.every((item) => item === undefined));
   }, [code]);
 
@@ -40,7 +39,7 @@ const Main = () => {
               MASTERMIND
             </Typography>
           </Stack>
-          <Stack mt={5} gap={1}>
+          <Stack mt={8} gap={1}>
             {noExistigCode && (
               <Button
                 component={Link}

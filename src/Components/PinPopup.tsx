@@ -1,4 +1,10 @@
-import { Button, Dialog, DialogContent, Stack } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Stack,
+} from "@mui/material";
 import PegRow, { PegPinsRow, PinColors } from "./PegRow";
 import { useContext, useEffect, useState } from "react";
 import { CodeContext } from "./AppWrapper";
@@ -40,12 +46,6 @@ export const PinPopup = ({
       r === rowIndex
         ? row.map((col: any, c: number) => (c === colIndex ? newValue : col))
         : row
-    );
-  };
-
-  const setAllBlack = (array: any[], rowIndex: number): any[] => {
-    return array.map((row, r) =>
-      r === rowIndex ? row.map(() => "black") : row
     );
   };
 
@@ -103,25 +103,19 @@ export const PinPopup = ({
                 setActiveColorAndAssignSlots={setActiveColorAndAssignSlots}
               />
             </Wrapper>
+          </Stack>
+          <DialogActions sx={{ justifyContent: "center" }}>
             <Button
+              sx={{ width: "200px" }}
               onClick={() => {
-                setAllCorrect(true);
-                setPins(setAllBlack(pins, activeRow));
                 onClose();
+                if (pins[activeRow].every((color) => color === "black"))
+                  setAllCorrect(true);
               }}
             >
-              Alt er riktig!
+              OK
             </Button>
-          </Stack>
-          <Button
-            onClick={() => {
-              onClose();
-              if (pins[activeRow].every((color) => color === "black"))
-                setAllCorrect(true);
-            }}
-          >
-            OK
-          </Button>
+          </DialogActions>
         </Stack>
       </DialogContent>
     </Dialog>

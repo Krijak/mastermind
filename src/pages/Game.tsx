@@ -106,12 +106,7 @@ const Game = () => {
             .map((row, i) => {
               const index = game.length - i - 1;
               return (
-                <Stack
-                  key={index}
-                  flexDirection={"row"}
-                  gap={2}
-                  alignItems={"center"}
-                >
+                <Stack key={index} flexDirection={"row"} alignItems={"center"}>
                   <PegRow
                     activeIndex={activeRow == index ? activeSlot : undefined}
                     slots={row}
@@ -120,7 +115,6 @@ const Game = () => {
                   />
                   {!allCorrect ? (
                     <Button
-                      sx={{ margin: 0, padding: 0, minWidth: "unset" }}
                       onClick={() => {
                         setActiveRow(index);
                         setOpenPinPopup(true);
@@ -149,8 +143,8 @@ const Game = () => {
           />
           {allCorrect && (
             <Stack mt={5} alignItems={"center"}>
-              <Typography>Gratulerer!</Typography>
-              <Typography mb={2}>👏👏👏</Typography>
+              <Typography>omg</Typography>
+              <Typography mb={3}>WOOOOHOOOO!!</Typography>
               <Button
                 onClick={() => {
                   resetGame();

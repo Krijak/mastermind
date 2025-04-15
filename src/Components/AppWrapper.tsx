@@ -22,8 +22,6 @@ export const emptyPins = Array(10).fill(
 export const emptyCode = Array(numPegs).fill(undefined) as CodeType;
 
 interface CodeContextType {
-  isCodeGuesser: boolean;
-  setIsCodeGuesser: (isCodeGuesser: boolean) => void;
   code: CodeType;
   setCode: (code: (Colors | undefined)[]) => void;
   game: GameType;
@@ -34,10 +32,6 @@ interface CodeContextType {
 }
 
 export const CodeContext = createContext<CodeContextType>({
-  isCodeGuesser: true,
-  setIsCodeGuesser: (isCodeGuesser: boolean) => {
-    isCodeGuesser;
-  },
   code: Array(numPegs).fill(undefined) as CodeType,
   setCode: (code: (Colors | undefined)[]) => {
     code;
@@ -58,28 +52,18 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   const mastermindCode = "mastermindCode";
   const mastermindGame = "mastermindGame";
   const mastermindPins = "mastermindPins";
-  const mastermindIsCodeGuesser = "mastermindIsCodeGuesser";
   const sessionStoredCodeJSON = sessionStorage.getItem(mastermindCode);
   const sessionStoredGameJSON = sessionStorage.getItem(mastermindGame);
   const sessionStoredPinsJSON = sessionStorage.getItem(mastermindPins);
-  const sessionStoredIsCodeGuesserJSON = sessionStorage.getItem(
-    mastermindIsCodeGuesser
-  );
   const sessionStoredCode =
     sessionStoredCodeJSON && JSON.parse(sessionStoredCodeJSON);
   const sessionStoredGame =
     sessionStoredGameJSON && JSON.parse(sessionStoredGameJSON);
   const sessionStoredPins =
     sessionStoredPinsJSON && JSON.parse(sessionStoredPinsJSON);
-  const sessionStoredIsCodeGuesser =
-    sessionStoredIsCodeGuesserJSON &&
-    JSON.parse(sessionStoredIsCodeGuesserJSON);
   const [code, setCode] = useState(sessionStoredCode ?? emptyCode);
   const [game, setGame] = useState(sessionStoredGame ?? emptyGame);
   const [pins, setPins] = useState(sessionStoredPins ?? emptyPins);
-  const [isCodeGuesser, setIsCodeGuesser] = useState(
-    sessionStoredIsCodeGuesser ?? true
-  );
   const location = useLocation();
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -93,18 +77,13 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     setCode(emptyCode);
     setGame(emptyGame);
     setPins(emptyPins);
-    setIsCodeGuesser(true);
   };
 
   useEffect(() => {
     sessionStorage.setItem(mastermindCode, JSON.stringify(code));
     sessionStorage.setItem(mastermindGame, JSON.stringify(game));
     sessionStorage.setItem(mastermindPins, JSON.stringify(pins));
-    sessionStorage.setItem(
-      mastermindIsCodeGuesser,
-      JSON.stringify(isCodeGuesser)
-    );
-  }, [code, game, pins, isCodeGuesser]);
+  }, [code, game, pins]);
 
   useLayoutEffect(() => {
     const viewbox = document.querySelectorAll(".apply-scroll-animation");
@@ -121,8 +100,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
         setCode,
         game,
         setGame,
-        isCodeGuesser,
-        setIsCodeGuesser,
         resetGame,
         pins,
         setPins,
