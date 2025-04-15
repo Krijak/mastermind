@@ -35,25 +35,6 @@ type Pegs = {
   pegs?: NumPegsType;
 };
 
-// export const setActiveSlotAndAssignColors = (
-//   index: number,
-//   activeSlot: number,
-//   activeColor: Colors | PinColors,
-//   setActiveSlot: (index: number | undefined) => void,
-//   setSlots: ([]) => void,
-//   slots: (Colors | undefined)[],
-//   setUndefined: () => void
-// ) => {
-//   activeSlot == index ? setActiveSlot(undefined) : setActiveSlot(index);
-//   if (slots[index] !== undefined) {
-//     setSlots(Object.assign([], slots, { [index]: undefined }));
-//     setUndefined();
-//   } else if (activeColor) {
-//     setSlots(Object.assign([], slots, { [index]: activeColor }));
-//     setUndefined();
-//   }
-// };
-
 export const SetCode = ({ pegs }: Pegs) => {
   const { code, setCode } = useContext(CodeContext);
   const [slots, setSlots] = useState<(Colors | undefined)[]>(pegs ?? code);
@@ -102,7 +83,6 @@ export const SetCode = ({ pegs }: Pegs) => {
   const OkLetsGo = () => {
     setCode(slots);
     navigate(routes.game);
-    sessionStorage.setItem("mastermindCode", JSON.stringify(slots));
   };
 
   return (

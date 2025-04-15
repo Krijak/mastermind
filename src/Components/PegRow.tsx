@@ -7,6 +7,7 @@ type PegRowType = {
   shadow?: boolean;
   rowNumber: number;
   activeIndex?: number;
+  notVisible?: boolean;
 };
 
 export type PinColors = "black" | "white";
@@ -44,6 +45,7 @@ export const PegRow = ({
   shadow,
   rowNumber,
   activeIndex,
+  notVisible,
 }: PegRowType) => {
   return (
     <Koderad shadow={shadow}>
@@ -58,7 +60,10 @@ export const PegRow = ({
             variant="text"
           >
             {slot ? (
-              <Peg color={slot} />
+              <Peg
+                color={slot}
+                notVisible={notVisible ? notVisible : undefined}
+              />
             ) : (
               <EmptySlot isActive={activeIndex == index} className="test" />
             )}
@@ -102,9 +107,10 @@ const PinWrapper = styled(Stack)({
 });
 
 export const Peg = styled("div", {
-  shouldForwardProp: (prop) => prop !== "color",
-})<PegColor>(({ color }) => ({
-  backgroundColor: color,
+  shouldForwardProp: (prop) => prop !== "notVisible",
+})<PegColor & { notVisible?: boolean }>(({ color, notVisible }) => ({
+  backgroundColor: notVisible ? "transparent" : color,
+  transition: "background-color 0.2s ease",
   height: "100%",
   width: "100%",
   borderRadius: "50%",

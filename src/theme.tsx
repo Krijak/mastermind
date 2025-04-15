@@ -23,6 +23,11 @@ export const theme = createTheme({
       },
     },
     MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: "22px",
+        },
+      },
       variants: [
         {
           props: { variant: "text" },
