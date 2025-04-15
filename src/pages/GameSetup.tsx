@@ -22,8 +22,8 @@ const GameSetup = () => {
         )}
         {started && (
           <>
-            <Typography variant="h2" mb={4}>
-              VELG KODE
+            <Typography variant="h2" mb={3}>
+              Velg kode
             </Typography>
             <SetCode />
           </>

@@ -4,9 +4,9 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Box, Button, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { routes } from "../variables";
-import PegRow from "./PegRow";
+import PegRow, { PinColors } from "./PegRow";
 import PegColors from "./PegColors";
-import { CodeContext } from "./AppWrapper";
+import { CodeContext, emptyCode } from "./AppWrapper";
 
 export type Tuple<
   T,
@@ -26,18 +26,17 @@ export const colors: Colors[] = [
   "black",
 ];
 
+export const pinColors: PinColors[] = ["black", "white"];
+
 export type PegColor = {
-  color: Colors;
+  color: Colors | undefined;
 };
 
 export type NumPegsType = Tuple<Colors | undefined, typeof numPegs>;
-type Pegs = {
-  pegs?: NumPegsType;
-};
 
-export const SetCode = ({ pegs }: Pegs) => {
+export const SetCode = () => {
   const { code, setCode } = useContext(CodeContext);
-  const [slots, setSlots] = useState<(Colors | undefined)[]>(pegs ?? code);
+  const [slots, setSlots] = useState<(Colors | undefined)[]>(code ?? emptyCode);
   const navigate = useNavigate();
 
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
@@ -100,7 +99,7 @@ export const SetCode = ({ pegs }: Pegs) => {
         {allSlotsAreFilled && (
           <Box mt={5} className="scroll-animation">
             <Button onClick={() => OkLetsGo()}>
-              OK, lets gooo!{" "}
+              OK, lets go{" "}
               <ArrowForwardIosIcon sx={{ fontSize: "0.8em", marginLeft: 1 }} />
             </Button>
           </Box>

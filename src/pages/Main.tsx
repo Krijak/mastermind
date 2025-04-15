@@ -40,38 +40,38 @@ const Main = () => {
               MASTERMIND
             </Typography>
           </Stack>
-          {noExistigCode && (
-            <Button
-              component={Link}
-              to={routes.gameSetup}
-              variant="outlined"
-              className="scroll-animation"
-            >
-              Start
-            </Button>
-          )}
-          {!noExistigCode && (
-            <Stack mt={3} gap={2}>
+          <Stack mt={5} gap={1}>
+            {noExistigCode && (
               <Button
                 component={Link}
-                to={routes.game}
-                variant="outlined"
+                to={routes.gameSetup}
                 className="scroll-animation"
               >
-                Fortsett å spille
+                Start
               </Button>
-              <Button
-                variant="text"
-                className="scroll-animation"
-                onClick={() => {
-                  resetGame();
-                  navigate(routes.gameSetup);
-                }}
-              >
-                Nytt spill
-              </Button>
-            </Stack>
-          )}
+            )}
+            {!noExistigCode && (
+              <>
+                <Button
+                  variant="text"
+                  className="scroll-animation"
+                  onClick={() => {
+                    resetGame();
+                    navigate(routes.gameSetup);
+                  }}
+                >
+                  Nytt spill
+                </Button>
+                <Button
+                  component={Link}
+                  to={routes.game}
+                  className="scroll-animation"
+                >
+                  Fortsett å spille
+                </Button>
+              </>
+            )}
+          </Stack>
         </Stack>
       </PageWrapper>
     </Box>

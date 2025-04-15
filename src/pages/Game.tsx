@@ -1,23 +1,25 @@
 import { useContext, useEffect, useState } from "react";
 import PageWrapper from "../Components/PageWrapper";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Box, Button, IconButton, Stack } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import BackButton from "../Components/BackButton";
 import PegRow, { PegPinsRow } from "../Components/PegRow";
 import { CodeContext } from "../Components/AppWrapper";
 import PegColors from "../Components/PegColors";
 import { styled } from "@mui/system";
 import { Colors } from "../Components/SetCode";
+import PinPopup from "../Components/PinPopup";
+import { useNavigate } from "react-router";
+import { routes } from "../variables";
 
 const Game = () => {
-  const { code, game, setGame, isCodeGuesser, setIsCodeGuesser } =
-    useContext(CodeContext);
-  const [showCode, setShowCode] = useState(false);
+  const { game, setGame, pins, resetGame } = useContext(CodeContext);
+  const [allCorrect, setAllCorrect] = useState(false);
   const [activeRow, setActiveRow] = useState(0);
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
   const [activeColor, setActiveColor] = useState<Colors | undefined>(undefined);
   const [allSlotsAreFilled, setAllSlotsAreFilled] = useState(false);
+  const [openPinPopup, setOpenPinPopup] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setAllSlotsAreFilled(areAllSlotsFilled());
@@ -48,13 +50,13 @@ const Game = () => {
   };
 
   const findFirstUndefined = (
-    array: (any | undefined)[][]
+    array: (any | undefined | null)[][]
   ): [number, number] | null => {
     return (
       array
         .flatMap((row, rowIndex) =>
           row.map((cell, colIndex) =>
-            cell === undefined ? [rowIndex, colIndex] : null
+            cell === undefined || cell === null ? [rowIndex, colIndex] : null
           )
         )
         .find((pos): pos is [number, number] => pos !== null) || null
@@ -75,12 +77,12 @@ const Game = () => {
 
   const setActiveColorAndAssignSlots = (color: Colors) => {
     setActiveColor(activeColor == color ? undefined : color);
-    if (activeSlot) {
+    if (activeSlot !== undefined) {
       setGame(setValueAtIndex(game, activeRow, activeSlot, color));
       setUndefined();
     } else {
       const firstUndefinedIndex = findFirstUndefined(game);
-      firstUndefinedIndex &&
+      firstUndefinedIndex != null &&
         setGame(
           setValueAtIndex(
             game,
@@ -110,70 +112,56 @@ const Game = () => {
                   gap={2}
                   alignItems={"center"}
                 >
-                  {/* <Stack width={"20px"} alignItems={"center"}>
-                    <Typography
-                      variant="h2"
-                      color={index == activeRow ? "red" : "grey"}
-                    >
-                      {index}
-                    </Typography>
-                  </Stack> */}
                   <PegRow
                     activeIndex={activeRow == index ? activeSlot : undefined}
                     slots={row}
                     rowNumber={index}
-                    {...(isCodeGuesser && {
-                      setActiveSlotAndAssignColors:
-                        setActiveSlotAndAssignColors,
-                    })}
+                    setActiveSlotAndAssignColors={setActiveSlotAndAssignColors}
                   />
-                  <PegPinsRow
-                    slots={[undefined, undefined, undefined, undefined]}
-                    {...(!isCodeGuesser && {
-                      setActiveSlotAndAssignColors: () =>
-                        console.log("codeguesser"),
-                    })}
-                  />
+                  {!allCorrect ? (
+                    <Button
+                      sx={{ margin: 0, padding: 0, minWidth: "unset" }}
+                      onClick={() => {
+                        setActiveRow(index);
+                        setOpenPinPopup(true);
+                      }}
+                    >
+                      <PegPinsRow slots={pins[index]} />
+                    </Button>
+                  ) : (
+                    <PegPinsRow slots={pins[index]} />
+                  )}
                 </Stack>
               );
             })}
-          {isCodeGuesser && (
+          {!allCorrect && (
             <CodeOrColorRow>
               <PegColors
                 setActiveColorAndAssignSlots={setActiveColorAndAssignSlots}
               />
             </CodeOrColorRow>
           )}
-          {!isCodeGuesser && (
-            <>
-              <CodeOrColorRow className="scroll-animation" gap={2}>
-                <PegRow
-                  slots={code}
-                  shadow
-                  rowNumber={0}
-                  notVisible={!showCode}
-                />
-                <Box>
-                  <IconButton onClick={() => setShowCode(!showCode)}>
-                    {showCode ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                  </IconButton>
-                </Box>
-              </CodeOrColorRow>
-            </>
+          <PinPopup
+            setAllCorrect={setAllCorrect}
+            open={openPinPopup}
+            onClose={() => setOpenPinPopup(false)}
+            activeRow={activeRow}
+          />
+          {allCorrect && (
+            <Stack mt={5} alignItems={"center"}>
+              <Typography>Gratulerer!</Typography>
+              <Typography mb={2}>👏👏👏</Typography>
+              <Button
+                onClick={() => {
+                  resetGame();
+                  navigate(routes.gameSetup);
+                }}
+              >
+                Spill igjen
+              </Button>
+            </Stack>
           )}
         </Stack>
-        <Box mt={2} className="scroll-animation">
-          <Button
-            onClick={() => {
-              isCodeGuesser
-                ? setIsCodeGuesser(!isCodeGuesser)
-                : setIsCodeGuesser(!isCodeGuesser);
-              setShowCode(false);
-            }}
-          >
-            {isCodeGuesser ? "Jeg er ferdig å gjette" : "jeg er ferdig å rette"}
-          </Button>
-        </Box>
       </PageWrapper>
     </>
   );

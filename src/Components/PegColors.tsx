@@ -1,9 +1,32 @@
 import { Box, Button, Stack, styled } from "@mui/material";
-import { colors, Colors } from "./SetCode";
-import { Peg } from "./PegRow";
+import { colors, Colors, pinColors } from "./SetCode";
+import { Peg, PinColors, PinPeg } from "./PegRow";
 
 type PegColorsType = {
   setActiveColorAndAssignSlots: (color: Colors) => void;
+};
+
+type PinColorsType = {
+  setActiveColorAndAssignSlots: (color: PinColors) => void;
+};
+
+export const PinColorsRow = ({
+  setActiveColorAndAssignSlots,
+}: PinColorsType) => {
+  return (
+    <Stack flexDirection="row">
+      {pinColors.map((color, index) => (
+        <PegSlotWrapper key={index}>
+          <StyledButton
+            onClick={() => setActiveColorAndAssignSlots(color)}
+            variant="text"
+          >
+            <PinPeg color={color} />
+          </StyledButton>
+        </PegSlotWrapper>
+      ))}
+    </Stack>
+  );
 };
 
 export const PegColors = ({ setActiveColorAndAssignSlots }: PegColorsType) => {

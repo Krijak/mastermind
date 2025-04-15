@@ -11,24 +11,36 @@ type PegRowType = {
 };
 
 export type PinColors = "black" | "white";
-type PegPinColors = { colors?: PinColors };
+type PegPinColors = { color: PinColors | undefined };
 
 type PegPinRowType = {
   setActiveSlotAndAssignColors?: (index: number) => void;
   slots: (PinColors | undefined)[];
-  shadow?: boolean;
+  big?: boolean;
 };
 
 export const PegPinsRow = ({
   slots,
   setActiveSlotAndAssignColors,
+  big,
 }: PegPinRowType) => {
   return (
-    <PinWrapper>
+    <PinWrapper width={big ? "50px" : "30px"} height={big ? "50px" : "30px"}>
       {slots.map((slot, index) => (
-        <Stack key={index} width={"15px"} height={"15px"}>
+        <Stack
+          key={index}
+          width={big ? "25px" : "15px"}
+          height={big ? "25px" : "15px"}
+        >
           <StyledButton
             disabled={!setActiveSlotAndAssignColors}
+            {...(!setActiveSlotAndAssignColors && {
+              component: "div",
+            })}
+            onClick={() =>
+              setActiveSlotAndAssignColors &&
+              setActiveSlotAndAssignColors(index)
+            }
             sx={{ padding: "2px" }}
           >
             {slot ? <PinPeg color={slot} /> : <EmptySlot className="test" />}
@@ -102,8 +114,6 @@ const Koderad = styled(Stack, {
 const PinWrapper = styled(Stack)({
   flexDirection: "row",
   flexWrap: "wrap",
-  width: "30px",
-  height: "30px",
 });
 
 export const Peg = styled("div", {
@@ -116,8 +126,8 @@ export const Peg = styled("div", {
   borderRadius: "50%",
 }));
 
-const PinPeg = styled("div", {
-  shouldForwardProp: (prop) => prop !== "color",
+export const PinPeg = styled("div", {
+  shouldForwardProp: (prop) => prop !== "notVisible",
 })<PegPinColors>(({ color }) => ({
   height: "100%",
   width: "100%",
