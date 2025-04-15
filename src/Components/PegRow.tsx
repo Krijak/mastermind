@@ -132,9 +132,9 @@ export const PinPeg = styled("div", {
   height: "100%",
   width: "100%",
   borderRadius: "50%",
-  background: `radial-gradient( circle at 30% 30%,${color},${
-    color == "white" ? "lightgrey" : "black"
-  })`,
+  background: `radial-gradient( circle at 30% 30%,${
+    color === "white" ? "#f4f6ff" : color
+  },${color == "white" ? "#bababa" : "black"})`,
 }));
 
 const EmptySlot = styled("div", {
