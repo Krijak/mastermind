@@ -41,6 +41,14 @@ const Game = () => {
     setActiveSlot(undefined);
   };
 
+  const isAllCorrect = (bol: boolean) => {
+    setAllCorrect(bol && noWrongs());
+  };
+
+  const noWrongs = () => {
+    return isError.filter((row) => row === true).length === 0;
+  };
+
   const calculateError = (rowIndex: number) => {
     const pinRow = pins[rowIndex];
     const row = game[rowIndex];
@@ -63,11 +71,7 @@ const Game = () => {
       correctNumWhite === numWhitesInPinRow
         ? false
         : true;
-    // const updated = isError.map((val, index) =>
-    //   index === rowIndex ? isWrong : val
-    // );
     return isWrong;
-    // setIsError(updated);
   };
 
   const setValueAtIndex = (
@@ -178,7 +182,7 @@ const Game = () => {
             </CodeOrColorRow>
           )}
           <PinPopup
-            setAllCorrect={setAllCorrect}
+            setAllCorrect={isAllCorrect}
             open={openPinPopup}
             onClose={() => {
               setOpenPinPopup(false);
@@ -193,7 +197,7 @@ const Game = () => {
           {allCorrect && (
             <>
               <Confetti />
-              <Stack mt={5} alignItems={"center"}>
+              <Stack mt={2} alignItems={"center"}>
                 <Typography>omg</Typography>
                 <Typography mb={3}>WOOOOHOOOO!!</Typography>
                 <Button
@@ -218,6 +222,6 @@ export default Game;
 const CodeOrColorRow = styled(Stack)({
   flexDirection: "row",
   alignItems: "center",
-  marginTop: "40px",
+  marginTop: "20px",
   height: "60px",
 });
