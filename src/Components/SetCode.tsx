@@ -8,6 +8,14 @@ import PegRow from "./PegRow";
 import PegColors from "./PegColors";
 import { CodeContext } from "./AppWrapper";
 
+export type Tuple<
+  T,
+  N extends number,
+  R extends T[] = []
+> = R["length"] extends N ? R : Tuple<T, N, [T, ...R]>;
+
+export const numPegs = 4 as const;
+
 export type Colors = "pink" | "red" | "green" | "purple" | "orange" | "black";
 export const colors: Colors[] = [
   "pink",
@@ -17,10 +25,6 @@ export const colors: Colors[] = [
   "orange",
   "black",
 ];
-export const numPegs = 4 as const;
-type Tuple<T, N extends number, R extends T[] = []> = R["length"] extends N
-  ? R
-  : Tuple<T, N, [T, ...R]>;
 
 export type PegColor = {
   color: Colors;
@@ -30,6 +34,25 @@ export type NumPegsType = Tuple<Colors | undefined, typeof numPegs>;
 type Pegs = {
   pegs?: NumPegsType;
 };
+
+// export const setActiveSlotAndAssignColors = (
+//   index: number,
+//   activeSlot: number,
+//   activeColor: Colors | PinColors,
+//   setActiveSlot: (index: number | undefined) => void,
+//   setSlots: ([]) => void,
+//   slots: (Colors | undefined)[],
+//   setUndefined: () => void
+// ) => {
+//   activeSlot == index ? setActiveSlot(undefined) : setActiveSlot(index);
+//   if (slots[index] !== undefined) {
+//     setSlots(Object.assign([], slots, { [index]: undefined }));
+//     setUndefined();
+//   } else if (activeColor) {
+//     setSlots(Object.assign([], slots, { [index]: activeColor }));
+//     setUndefined();
+//   }
+// };
 
 export const SetCode = ({ pegs }: Pegs) => {
   const { code, setCode } = useContext(CodeContext);
@@ -72,6 +95,7 @@ export const SetCode = ({ pegs }: Pegs) => {
     } else {
       const firstUndefinedIndex = slots.findIndex((slot) => slot === undefined);
       setSlots(Object.assign([], slots, { [firstUndefinedIndex]: color }));
+      setUndefined();
     }
   };
 
@@ -85,6 +109,7 @@ export const SetCode = ({ pegs }: Pegs) => {
     <>
       <Stack alignItems={"center"} gap={3} className="scroll-animation">
         <PegRow
+          rowNumber={0}
           slots={slots}
           setActiveSlotAndAssignColors={setActiveSlotAndAssignColors}
           shadow

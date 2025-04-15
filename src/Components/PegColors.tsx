@@ -33,6 +33,6 @@ const PegSlotWrapper = styled(Box)({
 const StyledButton = styled(Button)({
   width: "100%",
   height: "100%",
-  padding: 0,
+  padding: "10px",
   minWidth: "unset",
 });
