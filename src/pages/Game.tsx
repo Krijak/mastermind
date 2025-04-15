@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import PageWrapper from "../Components/PageWrapper";
 import { Button, Stack, Typography } from "@mui/material";
 import BackButton from "../Components/BackButton";
 import PegRow, { PegPinsRow } from "../Components/PegRow";
 import { CodeContext } from "../Components/AppWrapper";
 import PegColors from "../Components/PegColors";
-import { styled } from "@mui/system";
+import { Box, styled } from "@mui/system";
 import { Colors } from "../Components/SetCode";
 import PinPopup from "../Components/PinPopup";
 import { useNavigate } from "react-router";
@@ -13,14 +13,19 @@ import { routes } from "../variables";
 import Confetti from "../Components/Confetti";
 
 const Game = () => {
-  const { game, setGame, pins, resetGame } = useContext(CodeContext);
+  const { game, setGame, pins, resetGame, code } = useContext(CodeContext);
   const [allCorrect, setAllCorrect] = useState(false);
   const [activeRow, setActiveRow] = useState(0);
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
   const [activeColor, setActiveColor] = useState<Colors | undefined>(undefined);
   const [allSlotsAreFilled, setAllSlotsAreFilled] = useState(false);
   const [openPinPopup, setOpenPinPopup] = useState(false);
+  const [isError, setIsError] = useState(Array(10).fill(false));
   const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    setIsError(isError.map((_, index) => calculateError(index)));
+  }, []);
 
   useEffect(() => {
     setAllSlotsAreFilled(areAllSlotsFilled());
@@ -34,6 +39,35 @@ const Game = () => {
   const setUndefined = () => {
     setActiveColor(undefined);
     setActiveSlot(undefined);
+  };
+
+  const calculateError = (rowIndex: number) => {
+    const pinRow = pins[rowIndex];
+    const row = game[rowIndex];
+    const sortedrow = row.slice().sort();
+    const sortedCode = code.slice().sort();
+    const numCorrectColors = sortedrow.filter(
+      (color, i) => color === sortedCode[i]
+    ).length;
+    const numCorrectPlaced = row.filter((color, i) => color === code[i]).length;
+    const correctNumBlack = numCorrectPlaced;
+    const correctNumWhite = numCorrectColors - numCorrectPlaced;
+    const numWhitesInPinRow = pinRow.filter(
+      (color) => color === "white"
+    ).length;
+    const numBlacksInPinRow = pinRow.filter(
+      (color) => color === "black"
+    ).length;
+    const isWrong =
+      correctNumBlack === numBlacksInPinRow &&
+      correctNumWhite === numWhitesInPinRow
+        ? false
+        : true;
+    // const updated = isError.map((val, index) =>
+    //   index === rowIndex ? isWrong : val
+    // );
+    return isWrong;
+    // setIsError(updated);
   };
 
   const setValueAtIndex = (
@@ -99,7 +133,7 @@ const Game = () => {
   return (
     <>
       <BackButton text={false} />
-      <PageWrapper mt={-1} pt={0}>
+      <PageWrapper mt={-2} pt={0}>
         <Stack alignItems={"center"}>
           {game
             .slice()
@@ -123,7 +157,15 @@ const Game = () => {
                     })}
                     {...(allCorrect && { component: "div" })}
                   >
-                    <PegPinsRow slots={pins[index]} />
+                    <Box
+                      sx={{
+                        borderRadius: "6px",
+                        outline: isError[index] ? "1px solid red" : "",
+                        outlineOffset: "4px",
+                      }}
+                    >
+                      <PegPinsRow slots={pins[index]} />
+                    </Box>
                   </Button>
                 </Stack>
               );
@@ -138,7 +180,14 @@ const Game = () => {
           <PinPopup
             setAllCorrect={setAllCorrect}
             open={openPinPopup}
-            onClose={() => setOpenPinPopup(false)}
+            onClose={() => {
+              setOpenPinPopup(false);
+              setIsError(
+                isError.map((val, index) =>
+                  index === activeRow ? calculateError(activeRow) : val
+                )
+              );
+            }}
             activeRow={activeRow}
           />
           {allCorrect && (
