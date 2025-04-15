@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PageWrapper from "../Components/PageWrapper";
 import { routes } from "../variables";
 import { Peg } from "../Components/PegRow";
-import { areAllCodeSlotsFilled, PegColor } from "../Components/SetCode";
+import { areAllCodeSlotsFilled, colors, PegColor } from "../Components/SetCode";
 import { useContext, useEffect, useState } from "react";
 import { CodeContext } from "../Components/AppWrapper";
 
@@ -30,10 +30,10 @@ const Main = () => {
         <Stack gap={3} mt={3} alignItems={"center"}>
           <Stack gap={3}>
             <Stack gap={1}>
-              <LogoPeg color={"pink"} />
-              <LogoPeg color="red" />
-              <LogoPeg color="pink" />
-              <LogoPeg color="pink" />
+              <LogoPeg color={colors[0]} />
+              <LogoPeg color={colors[1]} />
+              <LogoPeg color={colors[0]} />
+              <LogoPeg color={colors[0]} />
             </Stack>
             <Typography variant="h3" component={"h1"}>
               MASTERMIND

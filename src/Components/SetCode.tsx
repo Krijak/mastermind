@@ -33,15 +33,21 @@ export const numPegs = 4 as const;
 //   "lightblue",
 // ];
 
-export type Colors = "pink" | "red" | "green" | "purple" | "orange" | "black";
+export type Colors =
+  | "#ffc0cb"
+  | "#ff0000"
+  | "#008000"
+  | "#800080"
+  | "#ffa500"
+  | "#000000";
 
 export const colors: Colors[] = [
-  "pink",
-  "red",
-  "green",
-  "purple",
-  "orange",
-  "black",
+  "#ffc0cb",
+  "#ff0000",
+  "#008000",
+  "#800080",
+  "#ffa500",
+  "#000000",
 ];
 
 export const pinColors: PinColors[] = ["black", "white"];

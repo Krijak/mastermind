@@ -1,6 +1,6 @@
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import PageWrapper from "../Components/PageWrapper";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import BackButton from "../Components/BackButton";
 import PegRow, { PegPinsRow } from "../Components/PegRow";
 import { CodeContext } from "../Components/AppWrapper";
