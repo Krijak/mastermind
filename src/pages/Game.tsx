@@ -62,46 +62,23 @@ const Game = () => {
   };
 
   const calculateError = (rowIndex: number) => {
-    console.log("rowIndex");
     const pinRow = pins[rowIndex];
     const row = game[rowIndex];
-    // const sortedrow = row.sort();
-    // const sortedCode = code.sort();
-    // console.log("sorted row: ", sortedrow);
-    // console.log("sorted code: ", sortedCode);
-    // const numCorrectColors = sortedrow.filter(
-    //   (color, i) => color === sortedCode[i]
-    // ).length;
     const numCorrectColors = countSharedValues(row, code);
-    console.log("numCorrect colors: ", numCorrectColors);
     const numCorrectPlaced = row.filter((color, i) => color === code[i]).length;
     const correctNumBlack = numCorrectPlaced;
     const correctNumWhite = numCorrectColors - numCorrectPlaced;
-    console.log("correct colors: ", numCorrectColors);
     const numWhitesInPinRow = pinRow.filter(
       (color) => color === "white"
     ).length;
     const numBlacksInPinRow = pinRow.filter(
       (color) => color === "black"
     ).length;
-    console.log(
-      "numWhites: ",
-      numWhitesInPinRow,
-      "correctWhites: ",
-      correctNumWhite
-    );
-    console.log(
-      "numBlacks: ",
-      numBlacksInPinRow,
-      "correctBlacks: ",
-      correctNumBlack
-    );
     const isWrong =
       correctNumBlack === numBlacksInPinRow &&
       correctNumWhite === numWhitesInPinRow
         ? false
         : true;
-    console.log("isWrong", isWrong);
     return isWrong;
   };
 
