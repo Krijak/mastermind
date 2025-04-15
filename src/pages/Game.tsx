@@ -205,9 +205,7 @@ const Game = () => {
           {allCorrect && (
             <>
               <Confetti />
-              <Stack mt={2} alignItems={"center"}>
-                <Typography>omg</Typography>
-                <Typography mb={3}>WOOOOHOOOO!!</Typography>
+              <Stack mt={4} alignItems={"center"}>
                 <Button
                   onClick={() => {
                     resetGame();
