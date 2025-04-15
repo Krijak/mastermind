@@ -14,8 +14,8 @@ const Game = () => {
 
   return (
     <>
-      <BackButton />
-      <PageWrapper mt={0}>
+      <BackButton text={false} />
+      <PageWrapper mt={0} pt={0}>
         {isCodeGuesser && (
           <Stack alignItems={"center"}>
             {slots.map((row, i) => (
