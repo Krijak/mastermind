@@ -30,7 +30,8 @@ const Game = () => {
   useEffect(() => {
     setAllSlotsAreFilled(areAllSlotsFilled());
     if (allSlotsAreFilled) setActiveRow(activeRow + 1);
-  }, [game]);
+    console.log(allCorrect);
+  }, [game, allCorrect]);
 
   const areAllSlotsFilled = (): boolean => {
     return game[activeRow].findIndex((slot: any) => slot === undefined) == -1;
@@ -42,6 +43,7 @@ const Game = () => {
   };
 
   const isAllCorrect = (bol: boolean, rowIndex: number) => {
+    console.log(bol && !calculateError(rowIndex));
     setAllCorrect(bol && !calculateError(rowIndex));
   };
 
@@ -145,7 +147,12 @@ const Game = () => {
   return (
     <>
       <BackButton text={false} />
-      <PageWrapper mt={-2} pt={0}>
+      <PageWrapper
+        mt={"-59px"}
+        pt={0}
+        justifyContent={"center"}
+        height={"100%"}
+      >
         <Stack alignItems={"center"}>
           {game
             .slice()
@@ -158,7 +165,10 @@ const Game = () => {
                     activeIndex={activeRow == index ? activeSlot : undefined}
                     slots={row}
                     rowNumber={index}
-                    setActiveSlotAndAssignColors={setActiveSlotAndAssignColors}
+                    {...(!allCorrect && {
+                      setActiveSlotAndAssignColors:
+                        setActiveSlotAndAssignColors,
+                    })}
                   />
                   <Button
                     {...(!allCorrect && {
@@ -167,7 +177,7 @@ const Game = () => {
                         setOpenPinPopup(true);
                       },
                     })}
-                    {...(allCorrect && { component: "div" })}
+                    {...(allCorrect && { component: "div", disabled: true })}
                   >
                     <Box
                       sx={{
