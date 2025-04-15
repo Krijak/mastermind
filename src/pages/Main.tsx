@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PageWrapper from "../Components/PageWrapper";
 import { routes } from "../variables";
 import { Peg } from "../Components/PegRow";
-import { PegColor } from "../Components/SetCode";
+import { areAllCodeSlotsFilled, PegColor } from "../Components/SetCode";
 import { useContext, useEffect, useState } from "react";
 import { CodeContext } from "../Components/AppWrapper";
 
@@ -63,7 +63,9 @@ const Main = () => {
                 </Button>
                 <Button
                   component={Link}
-                  to={routes.game}
+                  to={
+                    areAllCodeSlotsFilled(code) ? routes.game : routes.gameSetup
+                  }
                   className="scroll-animation"
                 >
                   Fortsett å spille

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { routes } from "../variables";
 import PegRow, { PinColors } from "./PegRow";
 import PegColors from "./PegColors";
-import { CodeContext, emptyCode } from "./AppWrapper";
+import { CodeContext } from "./AppWrapper";
 
 export type Tuple<
   T,
@@ -52,9 +52,12 @@ export type PegColor = {
 
 export type NumPegsType = Tuple<Colors | undefined, typeof numPegs>;
 
+export const areAllCodeSlotsFilled = (code: NumPegsType): boolean => {
+  return code.findIndex((slot) => slot === undefined || slot === null) == -1;
+};
+
 export const SetCode = () => {
   const { code, setCode } = useContext(CodeContext);
-  const [slots, setSlots] = useState<(Colors | undefined)[]>(code ?? emptyCode);
   const navigate = useNavigate();
 
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
@@ -62,12 +65,8 @@ export const SetCode = () => {
   const [allSlotsAreFilled, setAllSlotsAreFilled] = useState(false);
 
   useEffect(() => {
-    setAllSlotsAreFilled(areAllSlotsFilled());
-  }, [slots]);
-
-  const areAllSlotsFilled = (): boolean => {
-    return slots.findIndex((slot) => slot === undefined) == -1;
-  };
+    setAllSlotsAreFilled(areAllCodeSlotsFilled(code));
+  }, [code]);
 
   const setUndefined = () => {
     setActiveColor(undefined);
@@ -76,11 +75,11 @@ export const SetCode = () => {
 
   const setActiveSlotAndAssignColors = (index: number) => {
     activeSlot == index ? setActiveSlot(undefined) : setActiveSlot(index);
-    if (slots[index] !== undefined) {
-      setSlots(Object.assign([], slots, { [index]: undefined }));
+    if (code[index] !== undefined) {
+      setCode(Object.assign([], code, { [index]: undefined }));
       setUndefined();
     } else if (activeColor) {
-      setSlots(Object.assign([], slots, { [index]: activeColor }));
+      setCode(Object.assign([], code, { [index]: activeColor }));
       setUndefined();
     }
   };
@@ -88,17 +87,17 @@ export const SetCode = () => {
   const setActiveColorAndAssignSlots = (color: Colors) => {
     activeColor == color ? setActiveColor(undefined) : setActiveColor(color);
     if (activeSlot) {
-      setSlots(Object.assign([], slots, { [activeSlot]: color }));
+      setCode(Object.assign([], code, { [activeSlot]: color }));
       setUndefined();
     } else {
-      const firstUndefinedIndex = slots.findIndex((slot) => slot === undefined);
-      setSlots(Object.assign([], slots, { [firstUndefinedIndex]: color }));
+      const firstUndefinedIndex = code.findIndex((slot) => slot == undefined);
+      setCode(Object.assign([], code, { [firstUndefinedIndex]: color }));
       setUndefined();
     }
   };
 
   const OkLetsGo = () => {
-    setCode(slots);
+    setCode(code);
     navigate(routes.game);
   };
 
@@ -107,7 +106,7 @@ export const SetCode = () => {
       <Stack alignItems={"center"} gap={3} className="scroll-animation">
         <PegRow
           rowNumber={0}
-          slots={slots}
+          slots={code}
           setActiveSlotAndAssignColors={setActiveSlotAndAssignColors}
           shadow
         />
