@@ -10,6 +10,7 @@ import { Colors } from "../Components/SetCode";
 import PinPopup from "../Components/PinPopup";
 import { useNavigate } from "react-router";
 import { routes } from "../variables";
+import Confetti from "../Components/Confetti";
 
 const Game = () => {
   const { game, setGame, pins, resetGame } = useContext(CodeContext);
@@ -113,18 +114,17 @@ const Game = () => {
                     rowNumber={index}
                     setActiveSlotAndAssignColors={setActiveSlotAndAssignColors}
                   />
-                  {!allCorrect ? (
-                    <Button
-                      onClick={() => {
+                  <Button
+                    {...(!allCorrect && {
+                      onClick: () => {
                         setActiveRow(index);
                         setOpenPinPopup(true);
-                      }}
-                    >
-                      <PegPinsRow slots={pins[index]} />
-                    </Button>
-                  ) : (
+                      },
+                    })}
+                    {...(allCorrect && { component: "div" })}
+                  >
                     <PegPinsRow slots={pins[index]} />
-                  )}
+                  </Button>
                 </Stack>
               );
             })}
@@ -142,18 +142,21 @@ const Game = () => {
             activeRow={activeRow}
           />
           {allCorrect && (
-            <Stack mt={5} alignItems={"center"}>
-              <Typography>omg</Typography>
-              <Typography mb={3}>WOOOOHOOOO!!</Typography>
-              <Button
-                onClick={() => {
-                  resetGame();
-                  navigate(routes.gameSetup);
-                }}
-              >
-                Spill igjen
-              </Button>
-            </Stack>
+            <>
+              <Confetti />
+              <Stack mt={5} alignItems={"center"}>
+                <Typography>omg</Typography>
+                <Typography mb={3}>WOOOOHOOOO!!</Typography>
+                <Button
+                  onClick={() => {
+                    resetGame();
+                    navigate(routes.gameSetup);
+                  }}
+                >
+                  Spill igjen
+                </Button>
+              </Stack>
+            </>
           )}
         </Stack>
       </PageWrapper>
