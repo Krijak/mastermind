@@ -3,7 +3,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useNavigate } from "react-router-dom";
 import { routes } from "../variables";
 
-export const BackButton = ({ text = true }: { text?: boolean }) => {
+export const BackButton = ({ text = false }: { text?: boolean }) => {
   const navigate = useNavigate();
   return (
     <Box mt={3} ml={3}>
