@@ -27,7 +27,7 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   const [code, handleSetCode] = useState(fullGame.code);
 
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [useSameDevice, setUseSameDevice] = useState(false);
+  const [useSameDevice, handleSetUseSameDevice] = useState(false);
 
   useEffect(() => {
     const onConnect = () => {
@@ -87,6 +87,11 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     setFullGame({ ...fullGame, code: code });
   };
 
+  const setUseSameDevice = (useSameDevice: boolean) => {
+    handleSetUseSameDevice(useSameDevice);
+    // socket.emit("setUseSameDevice", useSameDevice);
+  };
+
   const resetGame = () => {
     handleSetCode(emptyFullGame.code);
     handleSetGame(emptyFullGame.game);
@@ -119,6 +124,8 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   return (
     <CodeContext.Provider
       value={{
+        setUseSameDevice,
+        useSameDevice,
         fullGame,
         setFullGame,
         game,

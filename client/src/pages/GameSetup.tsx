@@ -1,31 +1,84 @@
-import { Box, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import PageWrapper from "../Components/PageWrapper";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import BackButton from "../Components/BackButton";
 import SetCode from "../Components/SetCode";
+import { CodeContext } from "../variables";
+import { StyledDivider } from "../Components/StyledDivider";
+import { StyledTextField } from "../Components/StyledTextField";
+
+const ChooseCode = () => {
+  return (
+    <>
+      <Typography variant="h2" mb={3}>
+        Velg kode
+      </Typography>
+      <SetCode />
+    </>
+  );
+};
 
 const GameSetup = () => {
-  const [started, setStarted] = useState(true);
+  const { setUseSameDevice, useSameDevice } = useContext(CodeContext);
+  const [started, setStarted] = useState(false);
+
   return (
     <>
       <BackButton />
       <PageWrapper>
         {!started && (
           <>
-            <Typography>Setup</Typography>
-            <Box mt={5}>
-              <Button variant="outlined" onClick={() => setStarted(true)}>
-                Start
+            <Stack mt={5}>
+              <Button
+                onClick={() => {
+                  setUseSameDevice(true);
+                  setStarted(true);
+                }}
+              >
+                Spill på én enhet
               </Button>
-            </Box>
+              <Button
+                onClick={() => {
+                  setUseSameDevice(false);
+                  setStarted(true);
+                }}
+              >
+                Spill på to enheter
+              </Button>
+            </Stack>
           </>
         )}
         {started && (
           <>
-            <Typography variant="h2" mb={3}>
-              Velg kode
-            </Typography>
-            <SetCode />
+            {useSameDevice && <ChooseCode />}
+            {!useSameDevice && (
+              <>
+                <ChooseCode />
+                <Box width={"350px"} className="scroll-animation">
+                  <StyledDivider
+                    sx={{
+                      marginTop: "30px",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    ELLER
+                  </StyledDivider>
+                </Box>
+                <Stack alignItems={"center"} className="scroll-animation">
+                  <Typography variant="h2" mb={3} mt={4}>
+                    Bli med i et spill
+                  </Typography>
+                  <StyledTextField variant="outlined" size="small" />
+                </Stack>
+              </>
+            )}
           </>
         )}
       </PageWrapper>

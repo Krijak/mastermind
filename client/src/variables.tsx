@@ -71,6 +71,8 @@ export interface CodeContextType {
   game: GameType;
   pins: PinsType;
   code: CodeType;
+  useSameDevice: boolean;
+  setUseSameDevice: (useSameDevice: boolean) => void;
   setFullGame: (fullGame: FullGameType) => void;
   setGame: (game: GameType) => void;
   setPins: (pins: PinsType) => void;
@@ -83,6 +85,10 @@ export const CodeContext = createContext<CodeContextType>({
   game: emptyGame,
   code: emptyCode,
   pins: emptyPins,
+  useSameDevice: false,
+  setUseSameDevice: (useSameDevice: boolean) => {
+    useSameDevice;
+  },
   setFullGame: (fullGame: FullGameType) => {
     fullGame;
   },

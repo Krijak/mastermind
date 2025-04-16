@@ -4,6 +4,7 @@ const { createServer } = require('node:http');
 const http = require("http");
 // const Server = require("socket.io").Server;
 const { Server } = require('socket.io');
+const { makeid } = require('./utils');
 
 const app = express();
 
@@ -27,10 +28,24 @@ const io = new Server(server, {
     },
 });
 
+const state = {};
+const clientRooms = {};
 
 
 io.on("connection", (socket) => {
+    
+    const handleNewGame = () => {
+        const roomName = makeid(5);
+        clientRooms[client.id] = roomName;
+        client.emit("gameCode", roomName);
+
+        client.join(roomName);
+        client.number = 1;
+        client.emit('isUser', 1);
+    }
+
     console.log("A user connected");
+    socket.on("newGame", handleNewGame);
 
    socket.on("game", game => {
        io.emit("game", game);
