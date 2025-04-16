@@ -1,11 +1,9 @@
 import { default as ConfettiBoom } from "react-confetti-boom";
-import { Colors, colors, numPegs, Tuple } from "./SetCode";
 import { useContext } from "react";
-import { CodeContext } from "./AppWrapper";
+import { CodeContext, colors, Colors, numPegs, Tuple } from "../variables";
 
 export const Confetti = () => {
   const { code } = useContext(CodeContext);
-
   const effectCount = 10000000;
   const particleCount = 70;
   const shapeSize = 19;

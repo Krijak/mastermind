@@ -1,23 +1,10 @@
 import { Box, Button, Stack, styled } from "@mui/material";
-import { Colors, PegColor } from "./SetCode";
-
-type PegRowType = {
-  setActiveSlotAndAssignColors?: (index: number, rowNumber: number) => void;
-  slots: (Colors | undefined)[];
-  shadow?: boolean;
-  rowNumber: number;
-  activeIndex?: number;
-  notVisible?: boolean;
-};
-
-export type PinColors = "black" | "white";
-type PegPinColors = { color: PinColors | undefined };
-
-type PegPinRowType = {
-  setActiveSlotAndAssignColors?: (index: number) => void;
-  slots: (PinColors | undefined)[];
-  big?: boolean;
-};
+import {
+  PegColor,
+  PegPinColors,
+  PegPinRowType,
+  PegRowType,
+} from "../variables";
 
 export const PegPinsRow = ({
   slots,

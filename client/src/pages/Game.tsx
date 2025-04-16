@@ -3,13 +3,11 @@ import PageWrapper from "../Components/PageWrapper";
 import { Button, Stack } from "@mui/material";
 import BackButton from "../Components/BackButton";
 import PegRow, { PegPinsRow } from "../Components/PegRow";
-import { CodeContext } from "../Components/AppWrapper";
 import PegColors from "../Components/PegColors";
 import { Box, styled } from "@mui/system";
-import { Colors } from "../Components/SetCode";
 import PinPopup from "../Components/PinPopup";
 import { useNavigate } from "react-router";
-import { routes } from "../variables";
+import { CodeContext, CodeType, Colors, GameType, routes } from "../variables";
 import Confetti from "../Components/Confetti";
 
 const Game = () => {
@@ -30,11 +28,14 @@ const Game = () => {
   useEffect(() => {
     setAllSlotsAreFilled(areAllSlotsFilled());
     if (allSlotsAreFilled) setActiveRow(activeRow + 1);
-    console.log(allCorrect);
   }, [game, allCorrect]);
 
   const areAllSlotsFilled = (): boolean => {
-    return game[activeRow].findIndex((slot: any) => slot === undefined) == -1;
+    return (
+      game[activeRow].findIndex(
+        (slot: Colors | undefined) => slot == undefined
+      ) == -1
+    );
   };
 
   const setUndefined = () => {
@@ -43,12 +44,11 @@ const Game = () => {
   };
 
   const isAllCorrect = (bol: boolean, rowIndex: number) => {
-    console.log(bol && !calculateError(rowIndex));
     setAllCorrect(bol && !calculateError(rowIndex));
   };
 
-  const countSharedValues = (a: any[], b: any[]): number => {
-    const countOccurrences = (arr: any[]) =>
+  const countSharedValues = (a: CodeType, b: CodeType): number => {
+    const countOccurrences = (arr: CodeType) =>
       arr.reduce<Map<any, number>>((acc, item) => {
         acc.set(item, (acc.get(item) ?? 0) + 1);
         return acc;
@@ -85,22 +85,20 @@ const Game = () => {
   };
 
   const setValueAtIndex = (
-    array: any[],
+    array: GameType,
     rowIndex: number,
     colIndex: number,
-    newValue: any
-  ): any[] => {
+    newValue: Colors | undefined
+  ): GameType => {
     setActiveRow(rowIndex);
     return array.map((row, r) =>
       r === rowIndex
-        ? row.map((col: any, c: number) => (c === colIndex ? newValue : col))
+        ? row.map((col, c) => (c === colIndex ? newValue : col))
         : row
-    );
+    ) as GameType;
   };
 
-  const findFirstUndefined = (
-    array: (any | undefined | null)[][]
-  ): [number, number] | null => {
+  const findFirstUndefined = (array: GameType): [number, number] | null => {
     return (
       array
         .flatMap((row, rowIndex) =>
@@ -131,7 +129,7 @@ const Game = () => {
       setUndefined();
     } else {
       const firstUndefinedIndex = findFirstUndefined(game);
-      firstUndefinedIndex != null &&
+      if (firstUndefinedIndex != null) {
         setGame(
           setValueAtIndex(
             game,
@@ -140,6 +138,7 @@ const Game = () => {
             color
           )
         );
+      }
       setUndefined();
     }
   };

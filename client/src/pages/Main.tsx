@@ -1,11 +1,15 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import PageWrapper from "../Components/PageWrapper";
-import { routes } from "../variables";
+import {
+  areAllCodeSlotsFilled,
+  CodeContext,
+  colors,
+  PegColor,
+  routes,
+} from "../variables";
 import { Peg } from "../Components/PegRow";
-import { areAllCodeSlotsFilled, colors, PegColor } from "../Components/SetCode";
 import { useContext, useEffect, useState } from "react";
-import { CodeContext } from "../Components/AppWrapper";
 
 const LogoPeg = (color: PegColor) => (
   <Box height={"13px"} width={"13px"} className="scroll-animation">
@@ -17,7 +21,7 @@ const Main = () => {
   const navigate = useNavigate();
   const { code, resetGame } = useContext(CodeContext);
   const [noExistigCode, setNoExistigCode] = useState(
-    code.every((item) => item === undefined)
+    code.every((item) => item == undefined)
   );
 
   useEffect(() => {

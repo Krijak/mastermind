@@ -5,12 +5,12 @@ import {
   DialogContent,
   Stack,
 } from "@mui/material";
-import PegRow, { PegPinsRow, PinColors } from "./PegRow";
-import { useContext, useEffect, useState } from "react";
-import { CodeContext } from "./AppWrapper";
+import PegRow, { PegPinsRow } from "./PegRow";
+import { useContext, useState } from "react";
 import { PinColorsRow } from "./PegColors";
 
 import { styled } from "@mui/system";
+import { CodeContext, PinColors, PinsType } from "../variables";
 
 export const PinPopup = ({
   open,
@@ -29,7 +29,7 @@ export const PinPopup = ({
     undefined
   );
 
-  useEffect(() => {}, [activeColor, activeSlot]);
+  // useEffect(() => {}, [activeColor, activeSlot]);
 
   const setUndefined = () => {
     setActiveColor(undefined);
@@ -37,16 +37,16 @@ export const PinPopup = ({
   };
 
   const setValueAtIndex = (
-    array: any[],
+    array: PinsType,
     rowIndex: number,
     colIndex: number,
-    newValue: any
-  ): any[] => {
+    newValue: PinColors | undefined
+  ): PinsType => {
     return array.map((row, r) =>
       r === rowIndex
-        ? row.map((col: any, c: number) => (c === colIndex ? newValue : col))
+        ? row.map((col, c) => (c === colIndex ? newValue : col))
         : row
-    );
+    ) as PinsType;
   };
 
   const setActiveSlotAndAssignColors = (index: number) => {
@@ -69,7 +69,7 @@ export const PinPopup = ({
       const firstUndefinedIndex = pins[activeRow].findIndex(
         (slot) => slot === undefined || slot === null
       );
-      firstUndefinedIndex !== undefined &&
+      if (firstUndefinedIndex !== undefined)
         setPins(setValueAtIndex(pins, activeRow, firstUndefinedIndex, color));
       setUndefined();
     }
