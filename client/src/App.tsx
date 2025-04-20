@@ -8,8 +8,7 @@ import theme from "./theme";
 import { routes } from "./variables";
 import GameSetup from "./pages/GameSetup";
 import Game from "./pages/Game";
-// import { socket } from "./socket";
-// import axios from "axios";
+import NoRoom from "./pages/NoRoom";
 
 function App() {
   return (
@@ -21,7 +20,8 @@ function App() {
             <Route path={routes.forside} element={<Main />} />
             <Route path={routes.main} element={<Main />} />
             <Route path={routes.gameSetup} element={<GameSetup />} />
-            <Route path={routes.game} element={<Game />} />
+            <Route path={routes.gameRoomId} element={<Game />} />
+            <Route path={routes.noRoom} element={<NoRoom />} />
           </Routes>
         </ThemeProvider>
       </AppWrapper>

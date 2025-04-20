@@ -1,12 +1,12 @@
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import PageWrapper from "../Components/PageWrapper";
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import BackButton from "../Components/BackButton";
 import PegRow, { PegPinsRow } from "../Components/PegRow";
 import PegColors from "../Components/PegColors";
 import { Box, styled } from "@mui/system";
 import PinPopup from "../Components/PinPopup";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { CodeContext, CodeType, Colors, GameType, routes } from "../variables";
 import Confetti from "../Components/Confetti";
 
@@ -20,6 +20,8 @@ const Game = () => {
   const [openPinPopup, setOpenPinPopup] = useState(false);
   const [isError, setIsError] = useState(Array(10).fill(false));
   const navigate = useNavigate();
+  const params = useParams();
+  const room = params.roomid;
 
   useLayoutEffect(() => {
     setIsError(isError.map((_, index) => calculateError(index)));

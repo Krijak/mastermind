@@ -56,7 +56,7 @@ export const SetCode = () => {
   };
 
   const OkLetsGo = () => {
-    setCode(code);
+    setCode(code, true);
     navigate(routes.game);
   };
 

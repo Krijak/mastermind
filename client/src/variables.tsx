@@ -5,13 +5,17 @@ type RoutesType = {
   main: string;
   gameSetup: string;
   game: string;
+  gameRoomId: string;
+  noRoom: string;
 };
 
 export const routes: RoutesType = {
   forside: "/",
   main: "/main",
   gameSetup: "/gameSetup",
+  gameRoomId: "/game/:roomid?",
   game: "/game",
+  noRoom: "/noRoom",
 };
 
 export type Tuple<
@@ -51,6 +55,10 @@ export type PegPinRowType = {
   big?: boolean;
 };
 
+export type RoomIdType = string;
+
+export const roomidLength = 5;
+
 export const emptyGame = Array(10).fill(
   Array(numPegs).fill(undefined)
 ) as GameType;
@@ -72,11 +80,13 @@ export interface CodeContextType {
   pins: PinsType;
   code: CodeType;
   useSameDevice: boolean;
+  roomId: RoomIdType | undefined;
+  setRoomId: (roomId: RoomIdType) => void;
   setUseSameDevice: (useSameDevice: boolean) => void;
   setFullGame: (fullGame: FullGameType) => void;
   setGame: (game: GameType) => void;
   setPins: (pins: PinsType) => void;
-  setCode: (pins: CodeType) => void;
+  setCode: (code: CodeType, isNewGame?: boolean) => void;
   resetGame: () => void;
 }
 
@@ -86,6 +96,7 @@ export const CodeContext = createContext<CodeContextType>({
   code: emptyCode,
   pins: emptyPins,
   useSameDevice: false,
+  roomId: "",
   setUseSameDevice: (useSameDevice: boolean) => {
     useSameDevice;
   },
@@ -98,8 +109,12 @@ export const CodeContext = createContext<CodeContextType>({
   setPins: (pins: PinsType) => {
     pins;
   },
-  setCode: (code: CodeType) => {
+  setCode: (code: CodeType, isNewGame?: boolean) => {
     code;
+    isNewGame;
+  },
+  setRoomId: (roomId: RoomIdType) => {
+    roomId;
   },
   resetGame: () => {},
 });
