@@ -1,6 +1,6 @@
 import { PropsWithChildren, useEffect, useLayoutEffect, useState } from "react";
 import { useLocation } from "react-router";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { Button } from "@mui/material";
 import {
   CodeContext,
@@ -11,7 +11,8 @@ import {
 } from "../variables";
 
 const AppWrapper = ({ children }: PropsWithChildren) => {
-  const socket = io("http://localhost:8080");
+  // const socket = io("http://localhost:8080", { autoConnect: false });
+  // const socket = io("http://localhost:8080");
   const location = useLocation();
 
   const mastermindFullGame = "mastermindFullGame";
@@ -26,33 +27,59 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   const [pins, handleSetPins] = useState(fullGame.pins);
   const [code, handleSetCode] = useState(fullGame.code);
 
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  // const [isConnected, setIsConnected] = useState(socket.connected);
   const [useSameDevice, handleSetUseSameDevice] = useState(false);
 
+  const [socket, setSocket] = useState(null as Socket | null);
+
   useEffect(() => {
+    if (!socket) {
+      setSocket(io("http://localhost:8080"));
+    }
+
+    return () => {
+      socket?.disconnect();
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    console.log("rendered useffect");
+
+    const onConnected = () => {
+      console.log("ON CONNECTED");
+    };
+
     const onConnect = () => {
-      setIsConnected(true);
+      // setIsConnected(true);
+      console.log("on connect");
     };
     const onDisconnect = () => {
-      setIsConnected(false);
+      // setIsConnected(false);
+      console.log("on disconnect");
     };
 
     const onGame = (game: GameType) => {
       handleSetGame(game);
+      console.log(game);
     };
     const onCode = (code: CodeType) => {
       handleSetCode(code);
+      console.log(code);
     };
 
     const onPins = (pins: PinsType) => {
       handleSetPins(pins);
+      console.log(pins);
     };
 
     const onUseSameDevice = (useSameDevice: boolean) => {
       setUseSameDevice(useSameDevice);
     };
 
-    socket.on("connect", onConnect);
+    socket.on("connection", onConnected);
+    // socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("game", onGame);
     socket.on("pins", onPins);
@@ -60,30 +87,32 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     socket.on("setUseSameDevice", onUseSameDevice);
 
     return () => {
-      socket.off("connect", onConnect);
+      socket.off("connection", onConnected);
+      // socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("game", onGame);
       socket.off("pins", onPins);
       socket.off("code", onCode);
       socket.off("setUseSameDevice", onUseSameDevice);
+      socket.disconnect();
     };
-  }, []);
+  }, [socket]);
 
   const setGame = (game: GameType) => {
     handleSetGame(game);
-    if (!useSameDevice) socket.emit("game", game);
+    if (!useSameDevice) socket?.emit("game", game);
     setFullGame({ ...fullGame, game: game });
   };
 
   const setPins = (pins: PinsType) => {
     handleSetPins(pins);
-    if (!useSameDevice) socket.emit("pins", pins);
+    if (!useSameDevice) socket?.emit("pins", pins);
     setFullGame({ ...fullGame, pins: pins });
   };
 
   const setCode = (code: CodeType) => {
     handleSetCode(code);
-    if (!useSameDevice) socket.emit("code", code);
+    if (!useSameDevice) socket?.emit("code", code);
     setFullGame({ ...fullGame, code: code });
   };
 
@@ -99,7 +128,7 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     setFullGame(emptyFullGame);
   };
 
-  useEffect(() => {}, [isConnected]);
+  // useEffect(() => {}, [isConnected]);
 
   useEffect(() => {
     sessionStorage.setItem(mastermindFullGame, JSON.stringify(fullGame));
@@ -137,7 +166,7 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
         resetGame,
       }}
     >
-      <Button onClick={() => socket.emit("setUseSameDevice", !useSameDevice)}>
+      <Button onClick={() => socket?.emit("setUseSameDevice", !useSameDevice)}>
         {useSameDevice ? "true" : "false"}
       </Button>
       {children}

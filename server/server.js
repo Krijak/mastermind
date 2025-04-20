@@ -33,19 +33,19 @@ const clientRooms = {};
 
 
 io.on("connection", (socket) => {
+    console.log("A user connected", socket.id[0] + socket.id[1]);
     
-    const handleNewGame = () => {
-        const roomName = makeid(5);
-        clientRooms[client.id] = roomName;
-        client.emit("gameCode", roomName);
+    // const handleNewGame = () => {
+    //     const roomName = makeid(5);
+    //     clientRooms[client.id] = roomName;
+    //     client.emit("gameCode", roomName);
 
-        client.join(roomName);
-        client.number = 1;
-        client.emit('isUser', 1);
-    }
+    //     client.join(roomName);
+    //     client.number = 1;
+    //     client.emit('isUser', 1);
+    // }
 
-    console.log("A user connected");
-    socket.on("newGame", handleNewGame);
+    // socket.on("newGame", handleNewGame);
 
    socket.on("game", game => {
        io.emit("game", game);
@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
    });
 
     socket.on("disconnect", () => {
-        console.log("disconnected");
+        console.log("disconnected", socket.id[0]+socket.id[1]);
     });
 });
 
