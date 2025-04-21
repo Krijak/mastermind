@@ -19,7 +19,7 @@ const LogoPeg = (color: PegColor) => (
 
 const Main = () => {
   const navigate = useNavigate();
-  const { code, resetGame } = useContext(CodeContext);
+  const { code, resetGame, useSameDevice } = useContext(CodeContext);
   const [noExistigCode, setNoExistigCode] = useState(
     code.every((item) => item == undefined)
   );
@@ -29,42 +29,44 @@ const Main = () => {
   }, [code]);
 
   return (
-    <Box className="scroll-animation">
-      <PageWrapper>
-        <Stack gap={3} mt={3} alignItems={"center"}>
-          <Stack gap={3}>
-            <Stack gap={1}>
-              <LogoPeg color={colors[0]} />
-              <LogoPeg color={colors[1]} />
-              <LogoPeg color={colors[0]} />
-              <LogoPeg color={colors[0]} />
-            </Stack>
-            <Typography variant="h3" component={"h1"}>
-              MASTERMIND
-            </Typography>
+    <PageWrapper className="scroll-animation">
+      <Stack gap={3} mt={3} alignItems={"center"}>
+        <Stack gap={3}>
+          <Stack gap={1}>
+            <LogoPeg color={colors[0]} />
+            <LogoPeg color={colors[1]} />
+            <LogoPeg color={colors[0]} />
+            <LogoPeg color={colors[0]} />
           </Stack>
-          <Stack mt={8} gap={1}>
-            {noExistigCode && (
+          <Typography variant="h3" component={"h1"}>
+            MASTERMIND
+          </Typography>
+        </Stack>
+        <Stack mt={8} gap={1}>
+          {noExistigCode && (
+            <Button
+              onClick={() => {
+                resetGame();
+                navigate(routes.gameSetup);
+              }}
+              className="scroll-animation"
+            >
+              Start
+            </Button>
+          )}
+          {!noExistigCode && (
+            <>
               <Button
-                component={Link}
-                to={routes.gameSetup}
+                variant="text"
                 className="scroll-animation"
+                onClick={() => {
+                  resetGame();
+                  navigate(routes.gameSetup);
+                }}
               >
-                Start
+                Nytt spill
               </Button>
-            )}
-            {!noExistigCode && (
-              <>
-                <Button
-                  variant="text"
-                  className="scroll-animation"
-                  onClick={() => {
-                    resetGame();
-                    navigate(routes.gameSetup);
-                  }}
-                >
-                  Nytt spill
-                </Button>
+              {useSameDevice && (
                 <Button
                   component={Link}
                   to={
@@ -74,12 +76,12 @@ const Main = () => {
                 >
                   Fortsett å spille
                 </Button>
-              </>
-            )}
-          </Stack>
+              )}
+            </>
+          )}
         </Stack>
-      </PageWrapper>
-    </Box>
+      </Stack>
+    </PageWrapper>
   );
 };
 

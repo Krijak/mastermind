@@ -14,7 +14,7 @@ export const Confetti = () => {
         y={0}
         x={0.7}
         particleCount={particleCount}
-        effectInterval={3500}
+        effectInterval={2000}
         effectCount={effectCount}
         spreadDeg={360}
         shapeSize={shapeSize}
@@ -36,7 +36,7 @@ export const Confetti = () => {
         y={0.1}
         x={0.3}
         particleCount={particleCount}
-        effectInterval={2000}
+        effectInterval={2500}
         effectCount={effectCount}
         spreadDeg={360}
         shapeSize={shapeSize}

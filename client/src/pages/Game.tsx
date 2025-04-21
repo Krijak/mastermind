@@ -1,35 +1,52 @@
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import PageWrapper from "../Components/PageWrapper";
-import { Button, Stack, Typography } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Button, ClickAwayListener, Stack, Tooltip } from "@mui/material";
 import BackButton from "../Components/BackButton";
 import PegRow, { PegPinsRow } from "../Components/PegRow";
 import PegColors from "../Components/PegColors";
 import { Box, styled } from "@mui/system";
 import PinPopup from "../Components/PinPopup";
-import { useNavigate, useParams } from "react-router";
-import { CodeContext, CodeType, Colors, GameType, routes } from "../variables";
+import { useLocation, useNavigate, useParams } from "react-router";
+import { CodeContext, Colors, GameType, routes } from "../variables";
 import Confetti from "../Components/Confetti";
 
 const Game = () => {
-  const { game, setGame, pins, resetGame, code } = useContext(CodeContext);
+  const { game, setGame, pins, resetGame, roomId, useSameDevice, setRoomId } =
+    useContext(CodeContext);
   const [allCorrect, setAllCorrect] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [activeRow, setActiveRow] = useState(0);
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
   const [activeColor, setActiveColor] = useState<Colors | undefined>(undefined);
   const [allSlotsAreFilled, setAllSlotsAreFilled] = useState(false);
   const [openPinPopup, setOpenPinPopup] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const params = useParams();
   const room = params.roomid;
 
-  // useEffect(() => {
-  //   setIsError(isError.map((_, index) => calculateError(index)));
-  // }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.body.style.zoom = "100%";
+  });
 
   useEffect(() => {
     setAllSlotsAreFilled(areAllSlotsFilled());
     if (allSlotsAreFilled) setActiveRow(activeRow + 1);
   }, [game]);
+
+  useEffect(() => {
+    console.log(roomId);
+    if (room) {
+      setRoomId(room);
+      console.log("sat room", room);
+    }
+    if (roomId && !useSameDevice) {
+      setRoomId(roomId);
+      console.log("sat roomId");
+    }
+  }, []);
 
   const areAllSlotsFilled = (): boolean => {
     return (
@@ -45,12 +62,10 @@ const Game = () => {
   };
 
   const isAllCorrect = (bol: boolean) => {
-    console.log("allcorrect", bol);
     setAllCorrect(bol);
   };
 
   useEffect(() => {
-    console.log(pins);
     pins.forEach((row) => {
       if (row.every((color) => color === "black")) {
         setAllCorrect(true);
@@ -126,14 +141,51 @@ const Game = () => {
 
   return (
     <>
-      <BackButton text={false} onClick={handleBackClick} />
-      <PageWrapper
-        mt={"-59px"}
-        pt={0}
-        justifyContent={"center"}
-        height={"100%"}
+      <Stack
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        mr={3}
       >
-        <Stack alignItems={"center"}>
+        <BackButton text={false} onClick={handleBackClick} />
+        {roomId && !useSameDevice && (
+          <>
+            <ClickAwayListener onClickAway={() => setSnackbarOpen(false)}>
+              <Tooltip
+                title={`Kopierte ${roomId}`}
+                placement="bottom"
+                open={snackbarOpen}
+                onClose={() => setSnackbarOpen(false)}
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+                slotProps={{
+                  popper: {
+                    disablePortal: true,
+                  },
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(roomId);
+                    setSnackbarOpen(true);
+                    setTimeout(() => {
+                      setSnackbarOpen(false);
+                    }, 2000);
+                  }}
+                >
+                  {roomId}{" "}
+                  <ContentCopyIcon
+                    sx={{ fontSize: "0.9rem", marginLeft: "6px" }}
+                  />
+                </Button>
+              </Tooltip>
+            </ClickAwayListener>
+          </>
+        )}
+      </Stack>
+      <PageWrapper pt={0} mt={0} justifyContent={"center"} height={"100%"}>
+        <Stack alignItems={"center"} mb={20}>
           {game
             .slice()
             .reverse()

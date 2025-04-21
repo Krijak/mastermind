@@ -1,7 +1,6 @@
 import { PropsWithChildren, useEffect, useLayoutEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { io, Socket } from "socket.io-client";
-import { Button, Typography } from "@mui/material";
 import {
   CodeContext,
   CodeType,
@@ -13,8 +12,6 @@ import {
 } from "../variables";
 
 const AppWrapper = ({ children }: PropsWithChildren) => {
-  // const socket = io("http://localhost:8080", { autoConnect: false });
-  // const socket = io("http://localhost:8080");
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -33,14 +30,23 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   const [code, handleSetCode] = useState(fullGame.code);
   const [roomId, handleRoomId] = useState(sessionStoredRoomIdJSON ?? undefined);
 
-  const [isConnected, setIsConnected] = useState(false);
-  const [useSameDevice, handleSetUseSameDevice] = useState(false);
+  const [useSameDevice, handleSetUseSameDevice] = useState(true);
 
   const [socket, setSocket] = useState(null as Socket | null);
+  const url =
+    import.meta.env.MODE == "development"
+      ? "http://localhost:8080"
+      : "https://vaulted-fort-195914.ew.r.appspot.com/";
 
   useEffect(() => {
+    console.log(import.meta.env.MODE);
+    console.log(url);
     if (!socket) {
-      setSocket(io("http://localhost:8080"));
+      setSocket(
+        io(url, {
+          autoConnect: false,
+        })
+      );
     }
 
     return () => {
@@ -57,19 +63,15 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
       handleRoomId(roomId);
       sessionStorage.setItem(mastermindRoomId, roomId);
       console.log("roomId", roomId);
+      console.log("yohoo");
+      console.log(`${routes.game}/${roomId}`);
+      if (location.pathname != `${routes.game}/${roomId}`) {
+        navigate(`${routes.game}/${roomId}`);
+      }
     };
 
     const onConnected = () => {
       console.log("ON CONNECTED");
-    };
-
-    const onConnect = () => {
-      setIsConnected(true);
-      console.log("on connect");
-    };
-    const onDisconnect = () => {
-      setIsConnected(false);
-      console.log("on disconnect");
     };
 
     const onGame = (game: GameType) => {
@@ -89,7 +91,12 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     const handleJoinRoom = (ok: boolean) => {
       console.log("handlejoinroom", ok);
       if (ok) {
-        navigate(routes.game);
+        console.log(`${routes.game}/${roomId}`);
+        console.log("yeeeah");
+        if (location.pathname != `${routes.game}/${roomId}`) {
+          navigate(`${routes.game}/${roomId}`);
+        }
+        // navigate(routes.game);
         handleRoomId(roomId);
         initGame();
       } else navigate(routes.noRoom);
@@ -106,8 +113,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     socket.on("roomId", socketRoomId);
     socket.on("joinRoom", handleJoinRoom);
     socket.on("connection", onConnected);
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
     socket.on("game", onGame);
     socket.on("pins", onPins);
     socket.on("code", onCode);
@@ -117,8 +122,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
       socket.off("joinRoom", handleJoinRoom);
 
       socket.off("connection", onConnected);
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
       socket.off("game", onGame);
       socket.off("pins", onPins);
       socket.off("code", onCode);
@@ -143,12 +146,23 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   const setCode = (code: CodeType, isNewGame?: boolean) => {
     handleSetCode(code);
     if (isNewGame) {
+      socket?.connect();
       socket?.emit("newGame", code, game, pins);
-    } else if (!useSameDevice) socket?.emit("code", roomId, code);
+    }
     setFullGame({ ...fullGame, code: code });
   };
 
   const setRoomId = (roomId: RoomIdType) => {
+    if (!socket) {
+      setSocket(
+        io(url, {
+          autoConnect: false,
+        })
+      );
+    } else {
+      socket?.connect();
+    }
+    console.log("tried to join room");
     socket?.emit("joinRoom", roomId);
   };
 
@@ -208,7 +222,7 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
         setRoomId,
       }}
     >
-      <Typography>{roomId}</Typography>
+      {/* <Typography>{roomId}</Typography> */}
       {children}
     </CodeContext.Provider>
   );

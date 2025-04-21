@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, Collapse, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
   areAllCodeSlotsFilled,
@@ -13,7 +13,7 @@ import PegRow from "./PegRow";
 import PegColors from "./PegColors";
 
 export const SetCode = () => {
-  const { code, setCode } = useContext(CodeContext);
+  const { code, setCode, useSameDevice } = useContext(CodeContext);
   const navigate = useNavigate();
 
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
@@ -56,7 +56,7 @@ export const SetCode = () => {
   };
 
   const OkLetsGo = () => {
-    setCode(code, true);
+    setCode(code, useSameDevice ? false : true);
     navigate(routes.game);
   };
 
@@ -72,14 +72,14 @@ export const SetCode = () => {
         <PegColors
           setActiveColorAndAssignSlots={setActiveColorAndAssignSlots}
         />
-        {allSlotsAreFilled && (
-          <Box mt={5} className="scroll-animation">
+        <Collapse in={allSlotsAreFilled}>
+          <Box mt={3} className="scroll-animation">
             <Button onClick={() => OkLetsGo()}>
               OK, lets go{" "}
               <ArrowForwardIosIcon sx={{ fontSize: "0.8em", marginLeft: 1 }} />
             </Button>
           </Box>
-        )}
+        </Collapse>
       </Stack>
     </>
   );

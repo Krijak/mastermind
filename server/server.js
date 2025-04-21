@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const { createServer } = require('node:http');
 const http = require("http");
-// const Server = require("socket.io").Server;
 const { Server } = require('socket.io');
 const { makeid } = require('./utils');
 
@@ -12,18 +11,11 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON bodies
 
+
 const server = createServer(app);
-// const io = new Server(server);
-
-
-
-// Create an HTTP server using the Express app
-// const server = http.createServer(app);
-
-// Initialize a new instance of Socket.IO by passing the HTTP server
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173", // Allow requests from this origin and my frontend port = 5173
+        origin: ["http://localhost:5173","https://krijak.github.io"], // Allow requests from this origin and my frontend port = 5173
         methods: ["GET", "POST"], // Allow these HTTP methods
     },
 });
@@ -32,7 +24,7 @@ let gameState = {};
 let pinsState = {};
 let codeState = {};
 let allRooms = {};
-
+scheduleReset();
 
 io.on("connection", (socket) => {
     console.log("A user connected", socket.id[0] + socket.id[1]);
@@ -56,9 +48,14 @@ io.on("connection", (socket) => {
     socket.on("newGame", handleNewGame);
 
     socket.on("joinRoom", roomId => {
+        //note to self: when use url to connect, check if there is a code
+        //and not a room, codeState[roomId]
         console.log("join room ", roomId);
         const room = io.sockets.adapter.rooms.get(roomId);
         if (room){
+            console.log(allRooms);
+            console.log(socket.id);
+            console.log(allRooms[socket.id] == roomId);
             socket.join(roomId);
             allRooms[socket.id] = roomId;
             socket.emit("joinRoom", true);
@@ -66,36 +63,28 @@ io.on("connection", (socket) => {
 
             console.log("code", codeState[roomId]);
             console.log("game", gameState[roomId]);
-            // socket.emit("initGame", roomId);
             io.to(roomId).emit("game", gameState[roomId]);
             io.to(roomId).emit("code", codeState[roomId]);
             io.to(roomId).emit("pins", pinsState[roomId]);
 
-
-
-
         } else {
             socket.emit("joinRoom", false)
         }
-    })
+    });
+
+    
 
    socket.on("game", (roomId, game) => {
-    console.log(roomId);
-    // console.log(game);
-    // console.log(socket.id[0] + socket.id[1]);
-    // console.log(io.sockets.adapter.rooms.get(roomId));
-
-    console.log("gamestate", gameState);
-
         gameState[roomId]= game;
        io.to(roomId).emit("game", game);
-    //    console.log(roomId, gameState[roomId], socket.id[0] + socket.id[1]);
+       console.log(roomId, gameState[roomId], socket.id[0] + socket.id[1]);
+
    });
 
    socket.on("pins", (roomId, pins) => {
         pinsState[roomId] = pins;
        io.to(roomId).emit("pins", pins);
-       console.log(pins);
+       console.log(roomId, pinsState[roomId], socket.id[0] + socket.id[1]);
    });
 
    socket.on("code", (roomId, code) => {
@@ -112,3 +101,22 @@ io.on("connection", (socket) => {
 server.listen(8080, () => {
     console.log("server started on port 8080");
 });
+
+function scheduleReset() {
+    let reset = new Date();
+    const now = Date.now()
+    reset.setHours(4, 0, 0, 0);
+    if (now >= reset) {
+        reset.setDate(reset.getDate() + 1);
+      }
+    let t = reset.getTime() - now;
+
+    setTimeout(function() {
+        gameState = {};
+        pinsState = {};
+        codeState = {};
+        allRooms = {};
+        console.log("reset");
+        scheduleReset();
+    }, t);
+}

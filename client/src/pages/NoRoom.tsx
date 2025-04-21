@@ -7,7 +7,11 @@ const NoRoom = () => {
     <>
       <BackButton back />
       <PageWrapper>
-        <Typography>Hm, det finnes ingen rom med dette navnet</Typography>
+        <Typography>Hm,</Typography>
+        <Typography>kunne ikke finne et spill med dette navnet</Typography>
+        <Typography fontSize={"1.5rem"} mt={2}>
+          🤷
+        </Typography>
       </PageWrapper>
     </>
   );

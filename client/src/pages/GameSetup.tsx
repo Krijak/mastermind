@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Collapse, Stack, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
@@ -13,10 +6,9 @@ import PageWrapper from "../Components/PageWrapper";
 import { useContext, useState } from "react";
 import BackButton from "../Components/BackButton";
 import SetCode from "../Components/SetCode";
-import { CodeContext, roomidLength, routes } from "../variables";
+import { CodeContext, roomidLength } from "../variables";
 import { StyledDivider } from "../Components/StyledDivider";
 import { StyledTextField } from "../Components/StyledTextField";
-import { useNavigate } from "react-router";
 
 const ChooseCode = () => {
   return (
@@ -29,10 +21,47 @@ const ChooseCode = () => {
   );
 };
 
+export const JoinGame = ({
+  inputRoomid,
+  setinputRoomId,
+  setRoomId,
+}: {
+  inputRoomid: string;
+  setinputRoomId: (inputRoomid: string) => void;
+  setRoomId: (inputRoomid: string) => void;
+}) => {
+  return (
+    <Stack alignItems={"center"} className="scroll-animation">
+      <Typography variant="h2" mb={3} mt={4}>
+        Bli med i et spill
+      </Typography>
+      <StyledTextField
+        variant="outlined"
+        size="small"
+        value={inputRoomid}
+        sx={{ ".MuiInputBase-input": { fontSize: "1rem" } }}
+        onChange={(e) => setinputRoomId(e.target.value)}
+      />
+      <Collapse in={inputRoomid.length == roomidLength}>
+        <Box mt={3} className="scroll-animation">
+          <Button
+            onClick={
+              () => setRoomId(inputRoomid)
+              // navigate(routes.game + `/${inputRoomid}`)
+            }
+          >
+            OK, lets go{" "}
+            <ArrowForwardIosIcon sx={{ fontSize: "0.8em", marginLeft: 1 }} />
+          </Button>
+        </Box>
+      </Collapse>
+    </Stack>
+  );
+};
+
 const GameSetup = () => {
   const { setUseSameDevice, useSameDevice, setRoomId } =
     useContext(CodeContext);
-  const navigate = useNavigate();
   const [started, setStarted] = useState(false);
   const [inputRoomid, setinputRoomId] = useState("");
 
@@ -49,10 +78,10 @@ const GameSetup = () => {
           </Button>
         </Box>
       )}
-      <PageWrapper>
+      <PageWrapper {...(started && { mt: 3 })}>
         {!started && (
           <>
-            <Stack mt={5} className="scroll-animation">
+            <Stack mt={5} className="scroll-animation" gap={1}>
               <Button
                 onClick={() => {
                   setUseSameDevice(true);
@@ -88,33 +117,11 @@ const GameSetup = () => {
                     ELLER
                   </StyledDivider>
                 </Box>
-                <Stack alignItems={"center"} className="scroll-animation">
-                  <Typography variant="h2" mb={3} mt={4}>
-                    Bli med i et spill
-                  </Typography>
-                  <StyledTextField
-                    variant="outlined"
-                    size="small"
-                    value={inputRoomid}
-                    onChange={(e) => setinputRoomId(e.target.value)}
-                  />
-
-                  {inputRoomid.length == roomidLength && (
-                    <Box mt={5} className="scroll-animation">
-                      <Button
-                        onClick={
-                          () => setRoomId(inputRoomid)
-                          // navigate(routes.game + `/${inputRoomid}`)
-                        }
-                      >
-                        OK, lets go{" "}
-                        <ArrowForwardIosIcon
-                          sx={{ fontSize: "0.8em", marginLeft: 1 }}
-                        />
-                      </Button>
-                    </Box>
-                  )}
-                </Stack>
+                <JoinGame
+                  inputRoomid={inputRoomid}
+                  setRoomId={setRoomId}
+                  setinputRoomId={setinputRoomId}
+                />
               </>
             )}
           </>

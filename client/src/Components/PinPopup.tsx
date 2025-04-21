@@ -121,7 +121,6 @@ export const PinPopup = ({
   };
 
   useEffect(() => {
-    console.log("calculated errer");
     setIsError(calculateError(activeRow));
   }, []);
 
@@ -144,7 +143,12 @@ export const PinPopup = ({
     <Dialog
       open={open}
       onClose={onClose}
-      sx={{ transition: "height 0.25s ease-in" }}
+      sx={{
+        transition: "height 0.25s ease-in",
+        ".MuiDialog-paper": {
+          maxWidth: "unset",
+        },
+      }}
     >
       <DialogContent
         sx={{
