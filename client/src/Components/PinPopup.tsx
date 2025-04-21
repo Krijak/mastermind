@@ -1,16 +1,25 @@
 import {
+  Box,
   Button,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   Stack,
+  Typography,
 } from "@mui/material";
 import PegRow, { PegPinsRow } from "./PegRow";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PinColorsRow } from "./PegColors";
 
 import { styled } from "@mui/system";
-import { CodeContext, PinColors, PinsType } from "../variables";
+import {
+  CodeContext,
+  CodeType,
+  PinColors,
+  PinsType,
+  PinType,
+} from "../variables";
 
 export const PinPopup = ({
   open,
@@ -21,15 +30,15 @@ export const PinPopup = ({
   open: boolean;
   onClose: () => void;
   activeRow: number;
-  setAllCorrect: (allCorrect: boolean, activeRow: number) => void;
+  setAllCorrect: (allCorrect: boolean) => void;
 }) => {
   const { code, game, pins, setPins } = useContext(CodeContext);
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
   const [activeColor, setActiveColor] = useState<PinColors | undefined>(
     undefined
   );
-
-  // useEffect(() => {}, [activeColor, activeSlot]);
+  const [popupPins, setPopupPins] = useState(pins[activeRow]);
+  const [isError, setIsError] = useState(false);
 
   const setUndefined = () => {
     setActiveColor(undefined);
@@ -39,44 +48,104 @@ export const PinPopup = ({
   const setValueAtIndex = (
     array: PinsType,
     rowIndex: number,
-    colIndex: number,
-    newValue: PinColors | undefined
+    newValue: PinType
   ): PinsType => {
-    return array.map((row, r) =>
-      r === rowIndex
-        ? row.map((col, c) => (c === colIndex ? newValue : col))
-        : row
-    ) as PinsType;
+    return array.map((row, r) => (r === rowIndex ? newValue : row)) as PinsType;
   };
 
   const setActiveSlotAndAssignColors = (index: number) => {
-    setActiveSlot(activeSlot == index ? undefined : index);
-    if (pins && pins[activeRow][index] !== undefined) {
-      setPins(setValueAtIndex(pins, activeRow, index, undefined));
+    if (activeSlot == index) setActiveSlot(undefined);
+    else setActiveSlot(index);
+
+    if (popupPins[index] !== undefined) {
+      setPopupPins(Object.assign([], popupPins, { [index]: undefined }));
       setUndefined();
     } else if (activeColor) {
-      setPins(setValueAtIndex(pins, activeRow, index, activeColor));
+      setPopupPins(Object.assign([], popupPins, { [index]: activeColor }));
       setUndefined();
     }
   };
 
   const setActiveColorAndAssignSlots = (color: PinColors) => {
-    setActiveColor(activeColor == color ? undefined : color);
-    if (activeSlot !== undefined) {
-      setPins(setValueAtIndex(pins, activeRow, activeSlot, color));
+    if (activeColor == color) setActiveColor(undefined);
+    else setActiveColor(color);
+    if (activeSlot) {
+      setPopupPins(Object.assign([], popupPins, { [activeSlot]: color }));
       setUndefined();
     } else {
-      const firstUndefinedIndex = pins[activeRow].findIndex(
-        (slot) => slot === undefined || slot === null
+      const firstUndefinedIndex = popupPins.findIndex(
+        (slot) => slot == undefined
       );
-      if (firstUndefinedIndex !== undefined)
-        setPins(setValueAtIndex(pins, activeRow, firstUndefinedIndex, color));
+      setPopupPins(
+        Object.assign([], popupPins, { [firstUndefinedIndex]: color })
+      );
       setUndefined();
     }
   };
 
+  const countSharedValues = (a: CodeType, b: CodeType): number => {
+    const countOccurrences = (arr: CodeType) =>
+      arr.reduce<Map<any, number>>((acc, item) => {
+        acc.set(item, (acc.get(item) ?? 0) + 1);
+        return acc;
+      }, new Map());
+
+    const aCounts = countOccurrences(a);
+    const bCounts = countOccurrences(b);
+
+    return Array.from(aCounts.entries()).reduce((sum, [item, countA]) => {
+      const countB = bCounts.get(item) ?? 0;
+      return sum + Math.min(countA, countB);
+    }, 0);
+  };
+
+  const calculateError = (rowIndex: number) => {
+    const pinRow = popupPins;
+    const row = game[rowIndex];
+    const numCorrectColors = countSharedValues(row, code);
+    const numCorrectPlaced = row.filter((color, i) => color === code[i]).length;
+    const correctNumBlack = numCorrectPlaced;
+    const correctNumWhite = numCorrectColors - numCorrectPlaced;
+    const numWhitesInPinRow = pinRow.filter(
+      (color) => color === "white"
+    ).length;
+    const numBlacksInPinRow = pinRow.filter(
+      (color) => color === "black"
+    ).length;
+    const isWrong =
+      correctNumBlack === numBlacksInPinRow &&
+      correctNumWhite === numWhitesInPinRow
+        ? false
+        : true;
+    return isWrong;
+  };
+
+  useEffect(() => {
+    console.log("calculated errer");
+    setIsError(calculateError(activeRow));
+  }, []);
+
+  useEffect(() => {
+    setIsError(false);
+  }, [popupPins]);
+
+  const handleClose = () => {
+    const error = calculateError(activeRow);
+    if (error) {
+      setIsError(error);
+    } else {
+      setPins(setValueAtIndex(pins, activeRow, popupPins));
+      onClose();
+      if (popupPins.every((color) => color === "black")) setAllCorrect(true);
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      sx={{ transition: "height 0.25s ease-in" }}
+    >
       <DialogContent
         sx={{
           backgroundColor: (theme) => theme.palette.background.default,
@@ -89,11 +158,19 @@ export const PinPopup = ({
           <Stack flexDirection={"row"} gap={2}>
             <PegRow slots={game[activeRow]} rowNumber={0} />
             <Wrapper>
-              <PegPinsRow
-                big
-                slots={pins[activeRow]}
-                setActiveSlotAndAssignColors={setActiveSlotAndAssignColors}
-              />
+              <Box
+                sx={{
+                  borderRadius: "6px",
+                  outline: isError ? "1px solid red" : "",
+                  outlineOffset: "4px",
+                }}
+              >
+                <PegPinsRow
+                  big
+                  slots={popupPins}
+                  setActiveSlotAndAssignColors={setActiveSlotAndAssignColors}
+                />
+              </Box>
             </Wrapper>
           </Stack>
           <Stack flexDirection={"row"} gap={2} alignItems={"center"}>
@@ -105,16 +182,17 @@ export const PinPopup = ({
             </Wrapper>
           </Stack>
           <DialogActions sx={{ justifyContent: "center" }}>
-            <Button
-              sx={{ width: "200px" }}
-              onClick={() => {
-                onClose();
-                if (pins[activeRow].every((color) => color === "black"))
-                  setAllCorrect(true, activeRow);
-              }}
-            >
-              OK
-            </Button>
+            <Stack width={"100%"}>
+              <Collapse in={isError} sx={{ alignSelf: "center" }}>
+                <Typography alignSelf={"center"} color="red" mb={1}>
+                  Whops, her var det noe feil
+                </Typography>
+              </Collapse>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Button onClick={() => onClose()}>Avbryt</Button>
+                <Button onClick={() => handleClose()}>OK</Button>
+              </Stack>
+            </Stack>
           </DialogActions>
         </Stack>
       </DialogContent>

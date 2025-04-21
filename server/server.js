@@ -81,14 +81,15 @@ io.on("connection", (socket) => {
 
    socket.on("game", (roomId, game) => {
     console.log(roomId);
-    console.log(game);
-    console.log(socket.id[0] + socket.id[1]);
-    console.log(io.sockets.adapter.rooms.get(roomId));
+    // console.log(game);
+    // console.log(socket.id[0] + socket.id[1]);
+    // console.log(io.sockets.adapter.rooms.get(roomId));
+
+    console.log("gamestate", gameState);
 
         gameState[roomId]= game;
-        console.log("gamestate ", gameState[roomId]);
        io.to(roomId).emit("game", game);
-       console.log(roomId, gameState[roomId], socket.id[0] + socket.id[1]);
+    //    console.log(roomId, gameState[roomId], socket.id[0] + socket.id[1]);
    });
 
    socket.on("pins", (roomId, pins) => {

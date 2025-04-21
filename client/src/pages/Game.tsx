@@ -18,19 +18,18 @@ const Game = () => {
   const [activeColor, setActiveColor] = useState<Colors | undefined>(undefined);
   const [allSlotsAreFilled, setAllSlotsAreFilled] = useState(false);
   const [openPinPopup, setOpenPinPopup] = useState(false);
-  const [isError, setIsError] = useState(Array(10).fill(false));
   const navigate = useNavigate();
   const params = useParams();
   const room = params.roomid;
 
-  useLayoutEffect(() => {
-    setIsError(isError.map((_, index) => calculateError(index)));
-  }, []);
+  // useEffect(() => {
+  //   setIsError(isError.map((_, index) => calculateError(index)));
+  // }, []);
 
   useEffect(() => {
     setAllSlotsAreFilled(areAllSlotsFilled());
     if (allSlotsAreFilled) setActiveRow(activeRow + 1);
-  }, [game, allCorrect]);
+  }, [game]);
 
   const areAllSlotsFilled = (): boolean => {
     return (
@@ -45,46 +44,20 @@ const Game = () => {
     setActiveSlot(undefined);
   };
 
-  const isAllCorrect = (bol: boolean, rowIndex: number) => {
-    setAllCorrect(bol && !calculateError(rowIndex));
+  const isAllCorrect = (bol: boolean) => {
+    console.log("allcorrect", bol);
+    setAllCorrect(bol);
   };
 
-  const countSharedValues = (a: CodeType, b: CodeType): number => {
-    const countOccurrences = (arr: CodeType) =>
-      arr.reduce<Map<any, number>>((acc, item) => {
-        acc.set(item, (acc.get(item) ?? 0) + 1);
-        return acc;
-      }, new Map());
-
-    const aCounts = countOccurrences(a);
-    const bCounts = countOccurrences(b);
-
-    return Array.from(aCounts.entries()).reduce((sum, [item, countA]) => {
-      const countB = bCounts.get(item) ?? 0;
-      return sum + Math.min(countA, countB);
-    }, 0);
-  };
-
-  const calculateError = (rowIndex: number) => {
-    const pinRow = pins[rowIndex];
-    const row = game[rowIndex];
-    const numCorrectColors = countSharedValues(row, code);
-    const numCorrectPlaced = row.filter((color, i) => color === code[i]).length;
-    const correctNumBlack = numCorrectPlaced;
-    const correctNumWhite = numCorrectColors - numCorrectPlaced;
-    const numWhitesInPinRow = pinRow.filter(
-      (color) => color === "white"
-    ).length;
-    const numBlacksInPinRow = pinRow.filter(
-      (color) => color === "black"
-    ).length;
-    const isWrong =
-      correctNumBlack === numBlacksInPinRow &&
-      correctNumWhite === numWhitesInPinRow
-        ? false
-        : true;
-    return isWrong;
-  };
+  useEffect(() => {
+    console.log(pins);
+    pins.forEach((row) => {
+      if (row.every((color) => color === "black")) {
+        setAllCorrect(true);
+        return;
+      }
+    });
+  }, [pins]);
 
   const setValueAtIndex = (
     array: GameType,
@@ -145,9 +118,15 @@ const Game = () => {
     }
   };
 
+  const handleBackClick = () => {
+    if (allCorrect) {
+      resetGame();
+    } else return undefined;
+  };
+
   return (
     <>
-      <BackButton text={false} />
+      <BackButton text={false} onClick={handleBackClick} />
       <PageWrapper
         mt={"-59px"}
         pt={0}
@@ -180,13 +159,7 @@ const Game = () => {
                     })}
                     {...(allCorrect && { component: "div", disabled: true })}
                   >
-                    <Box
-                      sx={{
-                        borderRadius: "6px",
-                        outline: isError[index] ? "1px solid red" : "",
-                        outlineOffset: "4px",
-                      }}
-                    >
+                    <Box>
                       <PegPinsRow slots={pins[index]} />
                     </Box>
                   </Button>
@@ -201,15 +174,11 @@ const Game = () => {
             </CodeOrColorRow>
           )}
           <PinPopup
+            key={`dialog_${activeRow}`}
             setAllCorrect={isAllCorrect}
             open={openPinPopup}
             onClose={() => {
               setOpenPinPopup(false);
-              setIsError(
-                isError.map((val, index) =>
-                  index === activeRow ? calculateError(activeRow) : val
-                )
-              );
             }}
             activeRow={activeRow}
           />

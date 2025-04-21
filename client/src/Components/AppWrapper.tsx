@@ -78,11 +78,11 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     };
     const onCode = (code: CodeType) => {
       console.log("got code", code);
-
       handleSetCode(code);
     };
 
     const onPins = (pins: PinsType) => {
+      console.log("got pins", pins);
       handleSetPins(pins);
     };
 
@@ -91,6 +91,7 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
       if (ok) {
         navigate(routes.game);
         handleRoomId(roomId);
+        initGame();
       } else navigate(routes.noRoom);
     };
 
@@ -127,11 +128,8 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
 
   const setGame = (game: GameType) => {
     handleSetGame(game);
-    console.log(game);
-    console.log(useSameDevice);
     if (!useSameDevice) {
       socket?.emit("game", roomId, game);
-      console.log("emitted");
     }
     setFullGame({ ...fullGame, game: game });
   };
@@ -163,12 +161,18 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     handleSetGame(emptyFullGame.game);
     handleSetPins(emptyFullGame.pins);
     setFullGame(emptyFullGame);
+    handleRoomId("");
+    socket?.disconnect();
   };
 
   useEffect(() => {
-    sessionStorage.setItem(mastermindFullGame, JSON.stringify(fullGame));
+    sessionStorage.setItem(
+      mastermindFullGame,
+      JSON.stringify({ game: game, code: code, pins: pins })
+    );
+    console.log("sat session storage");
     if (roomId) sessionStorage.setItem(mastermindRoomId, roomId);
-  }, [game, code, pins, fullGame, roomId]);
+  }, [game, code, pins, roomId]);
 
   useLayoutEffect(() => {
     const observer = new IntersectionObserver((entries) => {
