@@ -7,9 +7,8 @@ const { makeid } = require('./utils');
 
 const app = express();
 
-// Use CORS middleware to enable cross-origin requests
 app.use(cors());
-app.use(express.json()); // Middleware to parse JSON bodies
+app.use(express.json());
 
 
 const server = createServer(app);
@@ -48,14 +47,11 @@ io.on("connection", (socket) => {
     socket.on("newGame", handleNewGame);
 
     socket.on("joinRoom", roomId => {
-        //note to self: when use url to connect, check if there is a code
-        //and not a room, codeState[roomId]
         console.log("join room ", roomId);
         const room = io.sockets.adapter.rooms.get(roomId);
         if (room){
-            console.log(allRooms);
-            console.log(socket.id);
-            console.log(allRooms[socket.id] == roomId);
+            console.log("join room", roomId, socket.id);
+            // console.log(allRooms[socket.id] == roomId);
             socket.join(roomId);
             allRooms[socket.id] = roomId;
             socket.emit("joinRoom", true);
@@ -66,6 +62,8 @@ io.on("connection", (socket) => {
             io.to(roomId).emit("game", gameState[roomId]);
             io.to(roomId).emit("code", codeState[roomId]);
             io.to(roomId).emit("pins", pinsState[roomId]);
+            console.log("emitted on join");
+
 
         } else {
             socket.emit("joinRoom", false)
@@ -116,7 +114,7 @@ function scheduleReset() {
         pinsState = {};
         codeState = {};
         allRooms = {};
-        console.log("reset");
+        console.log("reset matermind states");
         scheduleReset();
     }, t);
 }

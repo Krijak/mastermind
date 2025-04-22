@@ -19,7 +19,7 @@ const LogoPeg = (color: PegColor) => (
 
 const Main = () => {
   const navigate = useNavigate();
-  const { code, resetGame, useSameDevice } = useContext(CodeContext);
+  const { code, resetGame, roomId } = useContext(CodeContext);
   const [noExistigCode, setNoExistigCode] = useState(
     code.every((item) => item == undefined)
   );
@@ -66,17 +66,19 @@ const Main = () => {
               >
                 Nytt spill
               </Button>
-              {useSameDevice && (
-                <Button
-                  component={Link}
-                  to={
-                    areAllCodeSlotsFilled(code) ? routes.game : routes.gameSetup
-                  }
-                  className="scroll-animation"
-                >
-                  Fortsett å spille
-                </Button>
-              )}
+              <Button
+                component={Link}
+                to={
+                  areAllCodeSlotsFilled(code)
+                    ? roomId
+                      ? `${routes.game}/${roomId}`
+                      : routes.game
+                    : routes.gameSetup
+                }
+                className="scroll-animation"
+              >
+                Fortsett å spille
+              </Button>
             </>
           )}
         </Stack>

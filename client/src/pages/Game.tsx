@@ -7,13 +7,21 @@ import PegRow, { PegPinsRow } from "../Components/PegRow";
 import PegColors from "../Components/PegColors";
 import { Box, styled } from "@mui/system";
 import PinPopup from "../Components/PinPopup";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { CodeContext, Colors, GameType, routes } from "../variables";
 import Confetti from "../Components/Confetti";
 
 const Game = () => {
-  const { game, setGame, pins, resetGame, roomId, useSameDevice, setRoomId } =
-    useContext(CodeContext);
+  const {
+    game,
+    setGame,
+    pins,
+    resetGame,
+    roomId,
+    useSameDevice,
+    setRoomId,
+    setUseSameDevice,
+  } = useContext(CodeContext);
   const [allCorrect, setAllCorrect] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [activeRow, setActiveRow] = useState(0);
@@ -22,7 +30,6 @@ const Game = () => {
   const [allSlotsAreFilled, setAllSlotsAreFilled] = useState(false);
   const [openPinPopup, setOpenPinPopup] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   const params = useParams();
   const room = params.roomid;
 
@@ -37,14 +44,12 @@ const Game = () => {
   }, [game]);
 
   useEffect(() => {
-    console.log(roomId);
     if (room) {
       setRoomId(room);
-      console.log("sat room", room);
+      setUseSameDevice(false);
     }
     if (roomId && !useSameDevice) {
       setRoomId(roomId);
-      console.log("sat roomId");
     }
   }, []);
 
@@ -152,7 +157,7 @@ const Game = () => {
           <>
             <ClickAwayListener onClickAway={() => setSnackbarOpen(false)}>
               <Tooltip
-                title={`Kopierte ${roomId}`}
+                title={`Kopierte ${location.href}`}
                 placement="bottom"
                 open={snackbarOpen}
                 onClose={() => setSnackbarOpen(false)}
@@ -167,7 +172,7 @@ const Game = () => {
               >
                 <Button
                   onClick={() => {
-                    navigator.clipboard.writeText(roomId);
+                    navigator.clipboard.writeText(location.href);
                     setSnackbarOpen(true);
                     setTimeout(() => {
                       setSnackbarOpen(false);
