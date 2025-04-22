@@ -1,40 +1,64 @@
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import PageWrapper from "../Components/PageWrapper";
-import { Button, Stack } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Button, ClickAwayListener, Stack, Tooltip } from "@mui/material";
 import BackButton from "../Components/BackButton";
 import PegRow, { PegPinsRow } from "../Components/PegRow";
-import { CodeContext } from "../Components/AppWrapper";
 import PegColors from "../Components/PegColors";
 import { Box, styled } from "@mui/system";
-import { Colors } from "../Components/SetCode";
 import PinPopup from "../Components/PinPopup";
-import { useNavigate } from "react-router";
-import { routes } from "../variables";
+import { useNavigate, useParams } from "react-router";
+import { CodeContext, Colors, GameType, routes } from "../variables";
 import Confetti from "../Components/Confetti";
 
 const Game = () => {
-  const { game, setGame, pins, resetGame, code } = useContext(CodeContext);
+  const {
+    game,
+    setGame,
+    pins,
+    resetGame,
+    roomId,
+    useSameDevice,
+    setRoomId,
+    setUseSameDevice,
+  } = useContext(CodeContext);
   const [allCorrect, setAllCorrect] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [activeRow, setActiveRow] = useState(0);
   const [activeSlot, setActiveSlot] = useState<number | undefined>(undefined);
   const [activeColor, setActiveColor] = useState<Colors | undefined>(undefined);
   const [allSlotsAreFilled, setAllSlotsAreFilled] = useState(false);
   const [openPinPopup, setOpenPinPopup] = useState(false);
-  const [isError, setIsError] = useState(Array(10).fill(false));
   const navigate = useNavigate();
+  const params = useParams();
+  const room = params.roomid;
 
-  useLayoutEffect(() => {
-    setIsError(isError.map((_, index) => calculateError(index)));
-  }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.body.style.zoom = "100%";
+  });
 
   useEffect(() => {
     setAllSlotsAreFilled(areAllSlotsFilled());
     if (allSlotsAreFilled) setActiveRow(activeRow + 1);
-    console.log(allCorrect);
-  }, [game, allCorrect]);
+  }, [game]);
+
+  useEffect(() => {
+    if (room) {
+      setRoomId(room);
+      setUseSameDevice(false);
+    }
+    if (roomId && !useSameDevice) {
+      setRoomId(roomId);
+    }
+  }, []);
 
   const areAllSlotsFilled = (): boolean => {
-    return game[activeRow].findIndex((slot: any) => slot === undefined) == -1;
+    return (
+      game[activeRow].findIndex(
+        (slot: Colors | undefined) => slot == undefined
+      ) == -1
+    );
   };
 
   const setUndefined = () => {
@@ -42,65 +66,34 @@ const Game = () => {
     setActiveSlot(undefined);
   };
 
-  const isAllCorrect = (bol: boolean, rowIndex: number) => {
-    console.log(bol && !calculateError(rowIndex));
-    setAllCorrect(bol && !calculateError(rowIndex));
+  const isAllCorrect = (bol: boolean) => {
+    setAllCorrect(bol);
   };
 
-  const countSharedValues = (a: any[], b: any[]): number => {
-    const countOccurrences = (arr: any[]) =>
-      arr.reduce<Map<any, number>>((acc, item) => {
-        acc.set(item, (acc.get(item) ?? 0) + 1);
-        return acc;
-      }, new Map());
-
-    const aCounts = countOccurrences(a);
-    const bCounts = countOccurrences(b);
-
-    return Array.from(aCounts.entries()).reduce((sum, [item, countA]) => {
-      const countB = bCounts.get(item) ?? 0;
-      return sum + Math.min(countA, countB);
-    }, 0);
-  };
-
-  const calculateError = (rowIndex: number) => {
-    const pinRow = pins[rowIndex];
-    const row = game[rowIndex];
-    const numCorrectColors = countSharedValues(row, code);
-    const numCorrectPlaced = row.filter((color, i) => color === code[i]).length;
-    const correctNumBlack = numCorrectPlaced;
-    const correctNumWhite = numCorrectColors - numCorrectPlaced;
-    const numWhitesInPinRow = pinRow.filter(
-      (color) => color === "white"
-    ).length;
-    const numBlacksInPinRow = pinRow.filter(
-      (color) => color === "black"
-    ).length;
-    const isWrong =
-      correctNumBlack === numBlacksInPinRow &&
-      correctNumWhite === numWhitesInPinRow
-        ? false
-        : true;
-    return isWrong;
-  };
+  useEffect(() => {
+    pins.forEach((row) => {
+      if (row.every((color) => color === "black")) {
+        setAllCorrect(true);
+        return;
+      }
+    });
+  }, [pins]);
 
   const setValueAtIndex = (
-    array: any[],
+    array: GameType,
     rowIndex: number,
     colIndex: number,
-    newValue: any
-  ): any[] => {
+    newValue: Colors | undefined
+  ): GameType => {
     setActiveRow(rowIndex);
     return array.map((row, r) =>
       r === rowIndex
-        ? row.map((col: any, c: number) => (c === colIndex ? newValue : col))
+        ? row.map((col, c) => (c === colIndex ? newValue : col))
         : row
-    );
+    ) as GameType;
   };
 
-  const findFirstUndefined = (
-    array: (any | undefined | null)[][]
-  ): [number, number] | null => {
+  const findFirstUndefined = (array: GameType): [number, number] | null => {
     return (
       array
         .flatMap((row, rowIndex) =>
@@ -131,7 +124,7 @@ const Game = () => {
       setUndefined();
     } else {
       const firstUndefinedIndex = findFirstUndefined(game);
-      firstUndefinedIndex != null &&
+      if (firstUndefinedIndex != null) {
         setGame(
           setValueAtIndex(
             game,
@@ -140,20 +133,64 @@ const Game = () => {
             color
           )
         );
+      }
       setUndefined();
     }
   };
 
+  const handleBackClick = () => {
+    if (allCorrect) {
+      resetGame();
+    } else return undefined;
+  };
+
   return (
     <>
-      <BackButton text={false} />
-      <PageWrapper
-        mt={"-59px"}
-        pt={0}
-        justifyContent={"center"}
-        height={"100%"}
+      <Stack
+        flexDirection={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        mr={3}
       >
-        <Stack alignItems={"center"}>
+        <BackButton text={false} onClick={handleBackClick} />
+        {roomId && !useSameDevice && (
+          <>
+            <ClickAwayListener onClickAway={() => setSnackbarOpen(false)}>
+              <Tooltip
+                title={`Kopierte ${location.href}`}
+                placement="bottom"
+                open={snackbarOpen}
+                onClose={() => setSnackbarOpen(false)}
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+                slotProps={{
+                  popper: {
+                    disablePortal: true,
+                  },
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(location.href);
+                    setSnackbarOpen(true);
+                    setTimeout(() => {
+                      setSnackbarOpen(false);
+                    }, 2000);
+                  }}
+                >
+                  {roomId}{" "}
+                  <ContentCopyIcon
+                    sx={{ fontSize: "0.9rem", marginLeft: "6px" }}
+                  />
+                </Button>
+              </Tooltip>
+            </ClickAwayListener>
+          </>
+        )}
+      </Stack>
+      <PageWrapper pt={0} mt={0} justifyContent={"center"} height={"100%"}>
+        <Stack alignItems={"center"} mb={20}>
           {game
             .slice()
             .reverse()
@@ -179,13 +216,7 @@ const Game = () => {
                     })}
                     {...(allCorrect && { component: "div", disabled: true })}
                   >
-                    <Box
-                      sx={{
-                        borderRadius: "6px",
-                        outline: isError[index] ? "1px solid red" : "",
-                        outlineOffset: "4px",
-                      }}
-                    >
+                    <Box>
                       <PegPinsRow slots={pins[index]} />
                     </Box>
                   </Button>
@@ -200,15 +231,11 @@ const Game = () => {
             </CodeOrColorRow>
           )}
           <PinPopup
+            key={`dialog_${activeRow}`}
             setAllCorrect={isAllCorrect}
             open={openPinPopup}
             onClose={() => {
               setOpenPinPopup(false);
-              setIsError(
-                isError.map((val, index) =>
-                  index === activeRow ? calculateError(activeRow) : val
-                )
-              );
             }}
             activeRow={activeRow}
           />

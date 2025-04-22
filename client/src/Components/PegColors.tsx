@@ -1,6 +1,6 @@
 import { Box, Button, Stack, styled } from "@mui/material";
-import { colors, Colors, pinColors } from "./SetCode";
-import { Peg, PinColors, PinPeg } from "./PegRow";
+import { colors, Colors, pinColors, PinColors } from "../variables";
+import { Peg, PinPeg } from "./PegRow";
 
 type PegColorsType = {
   setActiveColorAndAssignSlots: (color: Colors) => void;
