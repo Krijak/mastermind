@@ -138,12 +138,6 @@ const Game = () => {
     }
   };
 
-  const handleBackClick = () => {
-    if (allCorrect) {
-      resetGame();
-    } else return undefined;
-  };
-
   return (
     <>
       <Stack
@@ -152,7 +146,7 @@ const Game = () => {
         alignItems={"center"}
         mr={3}
       >
-        <BackButton text={false} onClick={handleBackClick} />
+        <BackButton {...(allCorrect && { onClick: resetGame })} />
         {roomId && !useSameDevice && (
           <>
             <ClickAwayListener onClickAway={() => setSnackbarOpen(false)}>

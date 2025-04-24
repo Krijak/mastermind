@@ -1,11 +1,10 @@
 import { Box, Button, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { routes } from "../variables";
 
 export const BackButton = ({
   text = false,
-  back = false,
   onClick,
 }: {
   text?: boolean;
@@ -15,11 +14,7 @@ export const BackButton = ({
   const navigate = useNavigate();
 
   const handleOnClick = () => {
-    if (back) {
-      navigate(-1);
-    } else {
-      navigate(routes.forside);
-    }
+    navigate(routes.forside, { replace: true });
     if (onClick) onClick();
   };
 

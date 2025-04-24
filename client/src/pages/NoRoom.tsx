@@ -1,11 +1,15 @@
 import { Typography } from "@mui/material";
 import PageWrapper from "../Components/PageWrapper";
 import BackButton from "../Components/BackButton";
+import { useContext } from "react";
+import { CodeContext } from "../variables";
 
 const NoRoom = () => {
+  const { resetGame } = useContext(CodeContext);
+
   return (
     <>
-      <BackButton back />
+      <BackButton onClick={resetGame} />
       <PageWrapper>
         <Typography>Hm,</Typography>
         <Typography>kunne ikke finne et spill med dette navnet</Typography>

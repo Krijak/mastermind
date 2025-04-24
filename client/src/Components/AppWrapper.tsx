@@ -43,8 +43,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
-    console.log(import.meta.env.MODE);
-    console.log(url);
     if (!socket) {
       setSocket(
         io(url, {
@@ -69,10 +67,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
       }
     };
 
-    const onConnected = () => {
-      console.log("ON CONNECTED");
-    };
-
     const onGame = (game: GameType) => {
       console.log("got game", game);
       handleSetGame(game);
@@ -89,8 +83,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
 
     const handleJoinRoom = (ok: boolean) => {
       if (ok) {
-        console.log(`${routes.game}/${roomId}`);
-        console.log("yeeeah");
         if (location.pathname != `${routes.game}/${roomId}`) {
           navigate(`${routes.game}/${roomId}`);
         }
@@ -108,7 +100,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     socket.on("initGame", initGame);
     socket.on("roomId", socketRoomId);
     socket.on("joinRoom", handleJoinRoom);
-    socket.on("connection", onConnected);
     socket.on("game", onGame);
     socket.on("pins", onPins);
     socket.on("code", onCode);
@@ -116,8 +107,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
     return () => {
       socket.off("roomId", socketRoomId);
       socket.off("joinRoom", handleJoinRoom);
-
-      socket.off("connection", onConnected);
       socket.off("game", onGame);
       socket.off("pins", onPins);
       socket.off("code", onCode);
@@ -140,7 +129,6 @@ const AppWrapper = ({ children }: PropsWithChildren) => {
   };
 
   const setCode = (code: CodeType, isNewGame?: boolean) => {
-    console.log(code);
     handleSetCode(code);
     if (isNewGame) {
       socket?.connect();

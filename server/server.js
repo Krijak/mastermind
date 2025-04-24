@@ -29,6 +29,7 @@ io.on("connection", (socket) => {
     console.log("A user connected", socket.id[0] + socket.id[1]);
     
     const handleNewGame = (code, game, pins) => {
+        console.log("newGame");
         const roomId = makeid(5);
         allRooms[socket.id] = roomId;
         socket.emit("roomId", roomId);
@@ -47,11 +48,13 @@ io.on("connection", (socket) => {
     socket.on("newGame", handleNewGame);
 
     socket.on("joinRoom", roomId => {
-        console.log("join room ", roomId);
+        console.log("joinRoom ", roomId);
         const room = io.sockets.adapter.rooms.get(roomId);
+        console.log(allRooms);
+        // console.log(allRooms[socket.id] == roomId);
+        console.log(Object.values(allRooms).includes(roomId));
         if (room){
             console.log("join room", roomId, socket.id);
-            // console.log(allRooms[socket.id] == roomId);
             socket.join(roomId);
             allRooms[socket.id] = roomId;
             socket.emit("joinRoom", true);
@@ -65,6 +68,15 @@ io.on("connection", (socket) => {
             console.log("emitted on join");
 
 
+        } else if (Object.values(allRooms).includes(roomId)){
+            socket.emit("roomId", roomId);
+            socket.join(roomId);
+            io.to(roomId).emit("game", gameState[roomId]);
+            io.to(roomId).emit("code", codeState[roomId]);
+            io.to(roomId).emit("pins", pinsState[roomId]);
+            console.log("reopened room", roomId);
+            console.log(io.sockets.adapter.rooms);
+            
         } else {
             socket.emit("joinRoom", false)
         }
@@ -73,6 +85,7 @@ io.on("connection", (socket) => {
     
 
    socket.on("game", (roomId, game) => {
+    console.log("game");
         gameState[roomId]= game;
        io.to(roomId).emit("game", game);
        console.log(roomId, gameState[roomId], socket.id[0] + socket.id[1]);
@@ -80,12 +93,14 @@ io.on("connection", (socket) => {
    });
 
    socket.on("pins", (roomId, pins) => {
+    console.log("pins");
         pinsState[roomId] = pins;
        io.to(roomId).emit("pins", pins);
        console.log(roomId, pinsState[roomId], socket.id[0] + socket.id[1]);
    });
 
    socket.on("code", (roomId, code) => {
+    console.log("code");
         codeState[roomId] = code;
         io.to(roomId).emit("code", code);
        console.log(roomId, codeState[roomId], socket.id[0] + socket.id[1]);
