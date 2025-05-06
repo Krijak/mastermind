@@ -119,7 +119,6 @@ export const PinPeg = styled("div", {
   height: "100%",
   width: "100%",
   borderRadius: "50%",
-  // background: color,
   border: "1px solid #a7a7a7",
   background: `radial-gradient( circle at 30% 30%,${color},${
     color == "white" ? "#cacaca" : "black"

@@ -3,7 +3,11 @@ const cors = require("cors");
 const { createServer } = require('node:http');
 const http = require("http");
 const { Server } = require('socket.io');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const { makeid } = require('./utils');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 
@@ -18,6 +22,65 @@ const io = new Server(server, {
         methods: ["GET", "POST"], // Allow these HTTP methods
     },
 });
+
+
+const uri =process.env.DB_CONNECTIONSTRING;
+
+//"mongodb+srv://kristinajakobsen:ornF1lcqsEYFg6js@mastermindcluster.wh0kpgp.mongodb.net/?retryWrites=true&w=majority&appName=MastermindCluster";
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+
+//     const db = client.db("sample_guides");
+// const coll = db.collection("planets");
+// // find code goes here
+// const cursor = coll.find({ hasRings: true });
+
+    const db_gamestates = client.db("Mastermind").collection("GameState");
+    const gameState = db_gamestates.find({roomId: '12345'});
+    console.log(gameState);
+    // await gameState.map(item => console.log(item));
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+
+
+
+
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "kristinajakobsn@gmail.com",
+      pass: process.env.MAIL_PSWRD,
+    },
+  });
+
+let mailOptions = {
+    from: 'kristinajakobsn@gmail.com',
+    to: 'kristina.jakobsen@gmail.com',
+    subject: 'Mastermind',
+    html: ''
+};
 
 let gameState = {};
 let pinsState = {};
@@ -53,6 +116,7 @@ io.on("connection", (socket) => {
         console.log(allRooms);
         // console.log(allRooms[socket.id] == roomId);
         console.log(Object.values(allRooms).includes(roomId));
+
         if (room){
             console.log("join room", roomId, socket.id);
             socket.join(roomId);
@@ -78,6 +142,18 @@ io.on("connection", (socket) => {
             console.log(io.sockets.adapter.rooms);
             
         } else {
+            mailOptions.html = `
+            <p><b>Kunne ikke finne rommet: </b> ${roomId}</p>
+            <br>
+            <p>Data, allRooms: </p>
+            ${JSON.stringify(allRooms)}`;
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
             socket.emit("joinRoom", false)
         }
     });
@@ -130,6 +206,15 @@ function scheduleReset() {
         codeState = {};
         allRooms = {};
         console.log("reset matermind states");
+        mailOptions.html = `
+        <p><b>Reset all states. AllRooms: </b> ${JSON.stringify(allRooms)}</p>`;
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
         scheduleReset();
     }, t);
 }
